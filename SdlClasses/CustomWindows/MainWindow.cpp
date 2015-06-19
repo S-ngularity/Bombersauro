@@ -5,6 +5,8 @@
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/EventCodes.h"
 
+#include <vector>
+
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,27 +15,10 @@ MainWindow::MainWindow(Map* m) :
 	SdlWindow(	"Bombersauro", 20, 40, 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window size 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window resolution
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE) // superclass window constructor
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE), // superclass window constructor
+	camera(getWindowWidth(), getWindowHeight(), m->Tile(0, 0).getH() + 35)
 {
 	worldMap = m;
-
-	angle = glm::radians(135.f);
-	angleY = glm::radians(25.f);
-	deltaAngle = 0.0;
-	x=-18.0f;
-	y = worldMap->Tile(0, 0).getH() + 35;
-	z=-18.0f;
-	lx = 1.0f;
-	ly = -0.7f;
-	lz = 1.0f;
-	deltaMove=0.0;
-	deltaX=-1000;
-
-	proj = glm::perspective(glm::radians(75.f), getWindowWidth()/(float)getWindowHeight(), 0.1f, 500.f);
-
-	mousePressed = false;
-	boolAngle = false;
-	boolMove = false;
 
 	EventAggregator::Instance()->getEvent<EventCodes>().subscribe(
 															[&](EventCodes &c){ contentsChanged(c); });
@@ -53,162 +38,167 @@ MainWindow::~MainWindow()
 
 void MainWindow::contentsChanged(EventCodes &c)
 {
-	if(c.code == UIEVT_CONTENTSCHANGED || c.code == RENDER_HAPPENED)
+	if(c.code == UIEVT_CONTENTSCHANGED)
 		signalRefresh();
-
-	if(c.code == WINDOW_RESIZED)
-		proj = glm::perspective(glm::radians(75.f), getWindowWidth()/(float)getWindowHeight(), 0.1f, 500.f);
-}
-
-glm::mat4 MainWindow::getProj()
-{
-	return proj;
-}
-
-glm::mat4 MainWindow::getView()
-{
-	return glm::lookAt(	glm::vec3(x, y, z), glm::vec3(
-						x + 10 * lx, 
-						y + 10 * ly, 
-						z + 10 * lz),
-						glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 bool MainWindow::handleInternalSdlEvent(SDL_Event& event)
 {
-	int mouseX, mouseY;
-	switch(event.type)
-	{
-		case SDL_KEYDOWN:
-			switch(event.key.keysym.sym)
-			{
-				case SDLK_a:
-				case SDLK_LEFT:
-				{
-					boolAngle = true;
-					deltaAngle = -0.0015f;
-				}
-				break;
-				case SDLK_d:
-				case SDLK_RIGHT:
-				{
-					boolAngle = true;
-					deltaAngle = 0.0015f;
-				}
-				break;
-				case SDLK_w:
-				case SDLK_UP: 
-				{
-					boolMove = true;
-					deltaMove = 0.5;
-				}
-				break;
-				case SDLK_s:
-				case SDLK_DOWN: 
-				{
-					boolMove = true;
-					deltaMove = -0.5;
-				}		
-				break;
-			}
-		break;
-		case SDL_KEYUP:
-			switch(event.key.keysym.sym)
-			{
-				case SDLK_a:
-				case SDLK_LEFT:
-					if (deltaAngle < 0.0f)
-					{
-						boolAngle = false;
-						deltaAngle = 0.0f;
-					}
-				break;
-				case SDLK_d:
-				case SDLK_RIGHT:
-					if (deltaAngle > 0.0f)
-					{
-						boolAngle = false;
-						deltaAngle = 0.0f;
-					}
-				break;
-				case SDLK_w:
-				case SDLK_UP:
-					if (deltaMove > 0) 
-					{
-						boolMove = false;
-						deltaMove = 0;
-					}
-				break;
-				case SDLK_s:
-				case SDLK_DOWN: 			
-					if (deltaMove < 0)
-					{
-						boolMove = false;
-						deltaMove = 0;
-					}
-				break;
-			}
-		break;
-
-		case SDL_MOUSEBUTTONDOWN:
-			SDL_GetMouseState(&mouseX, &mouseY);
-
-			deltaX = mouseX;
-			deltaY = mouseY;
-
-			mousePressed = true;
-		break;
-		case SDL_MOUSEBUTTONUP:
-			angleY = angle2Y;
-			angle = angle2;
-
-			mousePressed = false;
-		break;
-
-		case SDL_MOUSEMOTION:
-			if(mousePressed)
-			{
-				SDL_GetMouseState(&mouseX, &mouseY);
-
-				angle2 = angle + (mouseX-deltaX)*0.005;
-				angle2Y = angleY + (mouseY-deltaY) * 0.005;
-				if (angle2Y > 1.57)
-					angle2Y = 1.57;
-				else if (angle2Y < -1.57)
-					angle2Y = -1.57;
-				lx = cos(angle2Y)*sin(angle2);
-				lz = -cos(angle2Y)*cos(angle2);
-				ly = -sin(angle2Y);
-			}
-		break;
-	}
-
-	if (boolMove)
-		moveMeFlat(deltaMove);
-
-	if (boolAngle)
-	{
-		angle += deltaAngle;
-		orientMe(angle);
-	}
-
+	camera.handleSdlEvent(event);
+	
 	return true;
-}
-
-void MainWindow::orientMe(float ang)
-{
-	lx = sin(ang);
-	lz = -cos(ang);
-}
-
-void MainWindow::moveMeFlat(float i)
-{
-	x = x + i*lx;
-	z = z + i*lz;
-	y = y + i*ly;
 }
 
 void MainWindow::createGui()
 {
 	//gui->addChild(bgUi);
+}
+
+void MainWindow::initScene()
+{
+	initMapObject();
+}
+
+void MainWindow::tick()
+{
+	camera.tick();
+}
+
+void MainWindow::renderScene()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	mapObject->render(camera.getProj(), camera.getView());
+
+	signalRefresh();
+}
+
+const int nVerts = 36;
+GLfloat vPos[3*nVerts] = {
+    // baixo
+    0, 0, 0,
+    0, 1, 0,
+    1, 0, 0,
+    1, 0, 0,
+    0, 1, 0,
+    1, 1, 0,
+
+    // frente
+    0, 0, 0,
+    1, 0, 0,
+    0, 0, 1,
+    0, 0, 1,
+    1, 0, 0,
+    1, 0, 1,
+
+    // lado direito
+    1, 0, 0,
+    1, 1, 0,
+    1, 0, 1,
+    1, 0, 1,
+    1, 1, 0,
+    1, 1, 1,
+
+    // cima
+    1, 0, 1,
+    1, 1, 1,
+    0, 0, 1,
+    0, 0, 1,
+    1, 1, 1,
+    0, 1, 1,
+
+    // lado esquerdo
+    0, 0, 0,
+    0, 0, 1,
+    0, 1, 0,
+    0, 1, 0,
+    0, 0, 1,
+    0, 1, 1,
+
+    // fundo
+    0, 1, 1,
+    1, 1, 1,
+    0, 1, 0,
+    0, 1, 0,
+    1, 1, 1,
+    1, 1, 0
+};
+
+GLfloat vColor[3*nVerts] = {
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+    0.396, 0.262, 0.129,
+
+    0.0, 0.7, 0.0,
+    0.0, 0.65, 0.0,
+    0.0, 0.6, 0.0,
+    0.0, 0.6, 0.0,
+    0.0, 0.65, 0.0,
+    0.0, 0.6, 0.0
+};
+
+void MainWindow::initMapObject()
+{
+	std::vector<GLfloat> vectorPos(3 * nVerts * worldMap->getMapWidth() * worldMap->getMapHeight());
+	std::vector<GLfloat> vectorColor(3 * nVerts * worldMap->getMapWidth() * worldMap->getMapHeight());
+
+	// percorre cada posição do mapa preenchendo um único vetor de vértices 
+	// com versões (das posições) do cubo original, 
+	// transladadas pela posição do mapa e escaladas pela altura do mapa naquela posição
+	int posAtual = 0; // <- preguiça de calcular de maneira bonita a posição no vetor
+	for(int i = 0; i < worldMap->getMapWidth(); i++)
+		for(int j = 0; j < worldMap->getMapHeight(); j++)
+			for(int k = 0; k < nVerts; k++)
+			{
+				glm::vec4 v = glm::vec4(vPos[k*3], vPos[k*3+1], vPos[k*3+2], 1);
+				glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, worldMap->Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
+
+				v = m * v;	
+
+				vectorPos[posAtual] = v[0];
+				vectorColor[posAtual] = vColor[k*3];
+				posAtual++;
+
+				vectorPos[posAtual] = v[1];
+				vectorColor[posAtual] = vColor[k*3 + 1];
+				posAtual++;
+
+				vectorPos[posAtual] = v[2];
+				vectorColor[posAtual] = vColor[k*3 + 2];
+				posAtual++;
+			}
+
+	mapObject = new GlObject(new CubeShader(), nVerts * worldMap->getMapWidth() * worldMap->getMapHeight(), &vectorPos[0], &vectorColor[0]);
+	mapObject->setModelMatrix(glm::mat4(1.0f));
 }

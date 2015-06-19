@@ -1,16 +1,21 @@
-#ifndef NOISEWINDOW
-#define NOISEWINDOW
+#ifndef MAINWINDOW
+#define MAINWINDOW
 
 #include "SdlClasses/SdlWindow.h"
+
+#include "GlCamera.h"
+#include "Geometry/GlObject.h"
+
 
 #include <SDL2/SDL.h>
 
 #include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Map;
-class Noise;
-class UiObject;
 class EventCodes;
 
 const int SCREEN_WIDTH = 800;
@@ -21,34 +26,29 @@ class MainWindow : public SdlWindow
 	private:
 		Map* worldMap;
 
+		GlCamera camera;
+
+		GlObject *mapObject;
+
 		// UiEvent handlers
 		void contentsChanged(EventCodes &c);
 
-		// UI creation
-		void createGui();
-
 		bool handleInternalSdlEvent(SDL_Event& event);
 
-		float angle, deltaAngle;
-		float x, y, z;
-		float lx, ly, lz, deltaMove;
-		float angle2,angle2Y,angleY;
-		int deltaX,deltaY;
-
-		glm::mat4 proj;
-
-		void orientMe(float ang);
-		void moveMeFlat(float i);
-
-		bool mousePressed;
-		bool boolAngle, boolMove;
+		// UI creation
+		void createGui();
+		
+		void initMapObject();
 
 	public:
 		MainWindow(Map* m);
 		~MainWindow();
 
-		glm::mat4 getProj();
-		glm::mat4 getView();
+		void initScene();
+
+		void tick();
+
+		void renderScene();
 };
 
 #endif
