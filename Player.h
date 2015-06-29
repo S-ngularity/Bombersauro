@@ -36,9 +36,8 @@ class Player
 		void orientMe(float angX, float angY);
 		void moveMeFlat(float i);
 
-		bool boolIsJumping;
-		float jumpSpeed;
-		float fallSpeed;
+		bool boolOnTheGround;
+		float ySpeed;
 
 		GlObject *playerAvatar;
 		GlCamera *playerCamera;

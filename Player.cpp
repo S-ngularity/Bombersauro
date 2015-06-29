@@ -113,8 +113,8 @@ Player::Player(Map *m, GlCamera *cam) : angleTempX(glm::radians(135.f)), angleTe
 	boolKeyboardAngle = false;
 	boolMove = false;
 
-	jumpSpeed = 0;
-	fallSpeed = 0;
+	boolOnTheGround = false;
+	ySpeed = 0;
 
 	angleX = glm::radians(135.f);
 	angleY = glm::radians(25.f);
@@ -194,30 +194,20 @@ void Player::tick()
 		}
 	}
 
-	if(boolIsJumping)
-	{
-		y += jumpSpeed;
-		jumpSpeed -= GRAVITY;
-
-		if(jumpSpeed <= 0)
-			boolIsJumping = false;
-	}
-
-	else if(y - 0.5f > worldMap->Tile(x, z).getH()) // not jumping aka falling
-	{
-		fallSpeed += GRAVITY;
-		y -= fallSpeed;
-	}
+	y += ySpeed;
+	ySpeed -= GRAVITY;
 
 	// checa se chegou no chão
 	if(y - 0.5f <= worldMap->Tile(x, z).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
 	{
 		y = worldMap->Tile(x, z).getH() + 0.5f;
-		jumpSpeed = 0;
-		fallSpeed = 0;
-		boolIsJumping = false;
+		ySpeed = 0;
+		boolOnTheGround = true;
 	}
-	
+
+	else
+		boolOnTheGround = false;
+
 	updateAvatarAndCamera();
 }
 
@@ -260,8 +250,8 @@ bool Player::handleSdlEvent(SDL_Event& event)
 
 				case SDLK_SPACE: 
 				{
-					boolIsJumping = true;
-					jumpSpeed = JUMP_START_SPEED;
+					//if(boolOnTheGround)
+						ySpeed = JUMP_START_SPEED;
 				}		
 				break;
 			}
@@ -364,13 +354,10 @@ void Player::moveMeFlat(float i)
 	y = y + i*ly;*/
 
 	float proxX = x + i*lx, proxZ = z + i*lz;
-
-	if(proxX >= ((int)x)+1 || proxZ >= ((int)z)+1 || proxX < ((int)x)+1 || proxZ < ((int)z)+1)
+	
+	if(y - 0.5f >= worldMap->Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
 	{
-		if(y - 0.5f >= worldMap->Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
-		{
-			x = proxX;
-			z = proxZ;
-		}
+		x = proxX;
+		z = proxZ;
 	}
 }
