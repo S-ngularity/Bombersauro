@@ -1,12 +1,12 @@
 #ifndef EVENTWINDOWRESIZED
 #define EVENTWINDOWRESIZED
 
-class EventWindowResized
+class WindowResized
 {
 	public:
 		int w, h;
 		
-		EventWindowResized(int w, int h) : w(w), h(h){}
+		WindowResized(int w, int h) : w(w), h(h){}
 };
 
 #endif

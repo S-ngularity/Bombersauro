@@ -1,7 +1,7 @@
 #include "SdlClasses/SdlWindow.h"
 
 #include "Events/EventAggregator.h"
-#include "Events/CustomEvents/EventWindowResized.h"
+#include "Events/CustomEvents/WindowResized.h"
 
 #include <iostream>
 
@@ -92,7 +92,7 @@ bool SdlWindow::handleSdlEvent(SDL_Event& e)
 					glViewport(0, 0, windowWidth, windowHeight);
 
 					//gui->setWindowScale(getWindowWidthScale(), getWindowHeightScale());
-					EventAggregator::Instance()->getEvent<EventWindowResized>().publishEvent(EventWindowResized(getWindowWidth(), getWindowHeight()));
+					EventAggregator::Instance()->getEvent<WindowResized>().publishEvent(WindowResized(getWindowWidth(), getWindowHeight()));
 
 					signalRefresh();
 				break;

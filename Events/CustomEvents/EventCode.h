@@ -1,10 +1,10 @@
-#ifndef EVENTCODES
-#define EVENTCODES
+#ifndef EVENTCODE
+#define EVENTCODE
 
-class EventCodes
+class EventCode
 {
 	public:
-		EventCodes(int c) { code = c;}
+		EventCode(int c) { code = c;}
 		int code;
 };
 

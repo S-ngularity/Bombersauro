@@ -11,6 +11,9 @@
 
 #include "SdlClasses/CustomWindows/MainWindow.h"
 
+#include "Events/EventAggregator.h"
+#include "Events/CustomEvents/Tick.h"
+
 #include <SDL2/SDL.h>
 
 #include <GL/glew.h>
@@ -68,7 +71,7 @@ int main(int argc, char* args[])
 			mainWindow->handleSdlEvent(event);
 		}
 
-		mainWindow->tick();
+		EventAggregator::Instance()->getEvent<Tick>().publishEvent(Tick());
 
 		mainWindow->renderScene();
 		mainWindow->doRefresh();

@@ -1,7 +1,7 @@
 #ifndef GLCAMERA
 #define GLCAMERA
 
-#include <functional>
+//#include <functional>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -24,35 +24,29 @@ class GlCamera
 		glm::mat4 projection;
 		void adjustProjection(int w, int h);
 
-		std::function<bool(SDL_Event& e)> evtHandler;
+		//std::function<bool(SDL_Event& e)> evtHandler;
 
-		float angleX, angleY, deltaAngle;
-		float angle2X,angle2Y;
-		int deltaX, deltaY;
-		float x, y, z;
-		float lx, ly, lz, deltaMove;
-
-		bool boolAngle, boolMove;
-		bool mousePressed;
-
-		void orientMe(float angX, float angY);
-		void moveMeFlat(float i);
+		double x, y, z;
+		double lookAtX, lookAtY, lookAtZ;
 
 	public:
-		GlCamera(int w, int h, int yHeight);
+		GlCamera(int w, int h);
 		virtual ~GlCamera();
 
 		glm::mat4 getView();
 		glm::mat4 getProj();
 
-		void tick();
+		void setPos(double newX, double newY, double newZ);
+		void lookAtPos(double newX, double newY, double newZ);
+
+		//void tick();
 
 		// Render
 		//void render(glm::mat4 projMatrix, glm::mat4 viewMatrix);
 		
 		// Events
-		void setSdlEventHandler(std::function<bool(SDL_Event& e)> evth);
-		bool handleSdlEvent(SDL_Event& e);
+		//void setSdlEventHandler(std::function<bool(SDL_Event& e)> evth);
+		//bool handleSdlEvent(SDL_Event& e);
 };
 
 # endif

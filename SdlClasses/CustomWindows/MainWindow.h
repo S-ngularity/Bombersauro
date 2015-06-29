@@ -6,6 +6,7 @@
 #include "GlCamera.h"
 #include "Geometry/GlObject.h"
 
+#include "Player.h"
 
 #include <SDL2/SDL.h>
 
@@ -16,7 +17,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 class Map;
-class EventCodes;
+class EventCode;
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 800;
@@ -26,12 +27,13 @@ class MainWindow : public SdlWindow
 	private:
 		Map* worldMap;
 
-		GlCamera camera;
-
 		GlObject *mapObject;
 
+		GlCamera *camera;
+		Player *player;
+
 		// UiEvent handlers
-		void contentsChanged(EventCodes &c);
+		void contentsChanged(EventCode &c);
 
 		bool handleInternalSdlEvent(SDL_Event& event);
 
@@ -45,8 +47,6 @@ class MainWindow : public SdlWindow
 		~MainWindow();
 
 		void initScene();
-
-		void tick();
 
 		void renderScene();
 };

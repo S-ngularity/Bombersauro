@@ -3,7 +3,7 @@
 #include "Map.h"
 
 #include "Events/EventAggregator.h"
-#include "Events/CustomEvents/EventCodes.h"
+#include "Events/CustomEvents/EventCode.h"
 
 #include <vector>
 
@@ -15,13 +15,13 @@ MainWindow::MainWindow(Map* m) :
 	SdlWindow(	"Bombersauro", 20, 40, 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window size 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window resolution
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE), // superclass window constructor
-	camera(getWindowWidth(), getWindowHeight(), m->Tile(0, 0).getH() + 35)
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE) // superclass window constructor
 {
 	worldMap = m;
+	mapObject = nullptr;
 
-	EventAggregator::Instance()->getEvent<EventCodes>().subscribe(
-															[&](EventCodes &c){ contentsChanged(c); });
+	EventAggregator::Instance()->getEvent<EventCode>().subscribe(
+															[&](EventCode &c){ contentsChanged(c); });
 
 	//createGui();
 
@@ -32,11 +32,14 @@ MainWindow::MainWindow(Map* m) :
 
 MainWindow::~MainWindow()
 {
-	EventAggregator::Instance()->getEvent<EventCodes>().unsubscribe(
-															[&](EventCodes &c){ contentsChanged(c); });
+	EventAggregator::Instance()->getEvent<EventCode>().unsubscribe(
+															[&](EventCode &c){ contentsChanged(c); });
+
+	if(mapObject != nullptr)
+		delete mapObject;
 }
 
-void MainWindow::contentsChanged(EventCodes &c)
+void MainWindow::contentsChanged(EventCode &c)
 {
 	if(c.code == UIEVT_CONTENTSCHANGED)
 		signalRefresh();
@@ -44,7 +47,7 @@ void MainWindow::contentsChanged(EventCodes &c)
 
 bool MainWindow::handleInternalSdlEvent(SDL_Event& event)
 {
-	camera.handleSdlEvent(event);
+	player->handleSdlEvent(event);
 	
 	return true;
 }
@@ -56,116 +59,117 @@ void MainWindow::createGui()
 
 void MainWindow::initScene()
 {
-	initMapObject();
-}
+	camera = new GlCamera(getWindowWidth(), getWindowHeight());
+	player = new Player(worldMap, camera);
 
-void MainWindow::tick()
-{
-	camera.tick();
+	initMapObject();
 }
 
 void MainWindow::renderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mapObject->render(camera.getProj(), camera.getView());
+	if(mapObject != nullptr)
+		mapObject->render(camera->getProj(), camera->getView());
+	
+	player->render(camera->getProj(), camera->getView());
 
 	signalRefresh();
 }
 
 const int nVerts = 36;
 GLfloat vPos[3*nVerts] = {
-    // baixo
-    0, 0, 0,
-    0, 1, 0,
-    1, 0, 0,
-    1, 0, 0,
-    0, 1, 0,
-    1, 1, 0,
+	// baixo
+	0, 0, 0,
+	0, 1, 0,
+	1, 0, 0,
+	1, 0, 0,
+	0, 1, 0,
+	1, 1, 0,
 
-    // frente
-    0, 0, 0,
-    1, 0, 0,
-    0, 0, 1,
-    0, 0, 1,
-    1, 0, 0,
-    1, 0, 1,
+	// frente
+	0, 0, 0,
+	1, 0, 0,
+	0, 0, 1,
+	0, 0, 1,
+	1, 0, 0,
+	1, 0, 1,
 
-    // lado direito
-    1, 0, 0,
-    1, 1, 0,
-    1, 0, 1,
-    1, 0, 1,
-    1, 1, 0,
-    1, 1, 1,
+	// lado direito
+	1, 0, 0,
+	1, 1, 0,
+	1, 0, 1,
+	1, 0, 1,
+	1, 1, 0,
+	1, 1, 1,
 
-    // cima
-    1, 0, 1,
-    1, 1, 1,
-    0, 0, 1,
-    0, 0, 1,
-    1, 1, 1,
-    0, 1, 1,
+	// cima
+	1, 0, 1,
+	1, 1, 1,
+	0, 0, 1,
+	0, 0, 1,
+	1, 1, 1,
+	0, 1, 1,
 
-    // lado esquerdo
-    0, 0, 0,
-    0, 0, 1,
-    0, 1, 0,
-    0, 1, 0,
-    0, 0, 1,
-    0, 1, 1,
+	// lado esquerdo
+	0, 0, 0,
+	0, 0, 1,
+	0, 1, 0,
+	0, 1, 0,
+	0, 0, 1,
+	0, 1, 1,
 
-    // fundo
-    0, 1, 1,
-    1, 1, 1,
-    0, 1, 0,
-    0, 1, 0,
-    1, 1, 1,
-    1, 1, 0
+	// fundo
+	0, 1, 1,
+	1, 1, 1,
+	0, 1, 0,
+	0, 1, 0,
+	1, 1, 1,
+	1, 1, 0
 };
 
 GLfloat vColor[3*nVerts] = {
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
 
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
 
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
 
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
 
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
-    0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
+	0.396, 0.262, 0.129,
 
-    0.0, 0.7, 0.0,
-    0.0, 0.65, 0.0,
-    0.0, 0.6, 0.0,
-    0.0, 0.6, 0.0,
-    0.0, 0.65, 0.0,
-    0.0, 0.6, 0.0
+	0.0, 0.7, 0.0,
+	0.0, 0.65, 0.0,
+	0.0, 0.6, 0.0,
+	0.0, 0.6, 0.0,
+	0.0, 0.65, 0.0,
+	0.0, 0.6, 0.0
 };
 
 void MainWindow::initMapObject()
