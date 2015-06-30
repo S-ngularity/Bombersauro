@@ -16,7 +16,6 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class Map;
 class EventCode;
 
 const int SCREEN_WIDTH = 800;
@@ -25,13 +24,6 @@ const int SCREEN_HEIGHT = 800;
 class MainWindow : public SdlWindow
 {
 	private:
-		Map* worldMap;
-
-		GlObject *mapObject;
-
-		GlCamera *camera;
-		Player *player;
-
 		// UiEvent handlers
 		void contentsChanged(EventCode &c);
 
@@ -43,7 +35,7 @@ class MainWindow : public SdlWindow
 		void initMapObject();
 
 	public:
-		MainWindow(Map* m);
+		MainWindow();
 		~MainWindow();
 
 		void initScene();

@@ -3,6 +3,8 @@
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/Tick.h"
 
+#include "Game.h"
+
 #define MOUSE_SENSIBILITY 0.004
 
 #define GRAVITY 0.004
@@ -107,7 +109,7 @@ GLfloat vAvatarColor[3*nVerts] = {
 };
 
 
-Player::Player(Map *m, GlCamera *cam) : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f)), mouseXPosOriginal(0), mouseYPosOriginal(0),  worldMap(m)
+Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f)), mouseXPosOriginal(0), mouseYPosOriginal(0)
 {
 	mousePressed = false;
 	boolKeyboardAngle = false;
@@ -121,14 +123,13 @@ Player::Player(Map *m, GlCamera *cam) : angleTempX(glm::radians(135.f)), angleTe
 	orientMe(angleX, angleY);
 
 	x = 0.5f;
-	y = worldMap->Tile(0, 0).getH() + 0.5f; // +0.5 para avatar não ficar metade dentro do chão
+	y = Game::Instance().getMap().Tile(0, 0).getH() + 0.5f; // +0.5 para avatar não ficar metade dentro do chão
 	z = 0.5f;
 
 	deltaAngle = 0.0;
 	deltaMove=0.0;
 
 	playerAvatar = new GlObject(new CubeShader(), nVerts, &vAvatarPos[0], &vAvatarColor[0]);
-	playerCamera = cam;
 	
 	updateAvatarAndCamera();
 
@@ -163,10 +164,10 @@ void Player::updateAvatarAndCamera()
 	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
 									* glm::rotate(glm::mat4(1.0f), -angX, glm::vec3(0, 1, 0)));
 									//* glm::rotate(glm::mat4(1.0f), -angY, glm::vec3(1, 0, 0)));
-	playerCamera->setPos(	x - camDist * lx, 
+	playerCamera.setPos(	x - camDist * lx, 
 							y + camHeightY + camDist * (-ly), 
 							z - camDist * lz);
-	playerCamera->lookAtPos(x + 10 * lx, 
+	playerCamera.lookAtPos(x + 10 * lx, 
 							y + 10 * ly, 
 							z + 10 * lz);
 }
@@ -198,9 +199,9 @@ void Player::tick()
 	ySpeed -= GRAVITY;
 
 	// checa se chegou no chão
-	if(y - 0.5f <= worldMap->Tile(x, z).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
+	if(y - 0.5f <= Game::Instance().getMap().Tile(x, z).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
 	{
-		y = worldMap->Tile(x, z).getH() + 0.5f;
+		y = Game::Instance().getMap().Tile(x, z).getH() + 0.5f;
 		ySpeed = 0;
 		boolOnTheGround = true;
 	}
@@ -355,9 +356,14 @@ void Player::moveMeFlat(float i)
 
 	float proxX = x + i*lx, proxZ = z + i*lz;
 	
-	if(y - 0.5f >= worldMap->Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
+	if(y - 0.5f >= Game::Instance().getMap().Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
 	{
 		x = proxX;
 		z = proxZ;
 	}
+}
+
+GlCamera& Player::getCamera()
+{
+	return playerCamera;
 }

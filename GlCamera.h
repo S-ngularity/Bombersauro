@@ -22,7 +22,6 @@ class GlCamera
 {
 	private:
 		glm::mat4 projection;
-		void adjustProjection(int w, int h);
 
 		//std::function<bool(SDL_Event& e)> evtHandler;
 
@@ -30,7 +29,7 @@ class GlCamera
 		double lookAtX, lookAtY, lookAtZ;
 
 	public:
-		GlCamera(int w, int h);
+		GlCamera();
 		virtual ~GlCamera();
 
 		glm::mat4 getView();
@@ -38,6 +37,8 @@ class GlCamera
 
 		void setPos(double newX, double newY, double newZ);
 		void lookAtPos(double newX, double newY, double newZ);
+
+		void adjustProjection(int w, int h);
 
 		//void tick();
 

@@ -40,21 +40,22 @@ class Player
 		float ySpeed;
 
 		GlObject *playerAvatar;
-		GlCamera *playerCamera;
+		
+		GlCamera playerCamera;
 
 		void updateAvatarAndCamera();
-
-		Map *worldMap;
 
 		void tick();
 
 	public:
-		Player(Map *m, GlCamera *cam);
+		Player();
 		~Player();
 
 		void render(glm::mat4 projMatrix, glm::mat4 viewMatrix);
 
 		bool handleSdlEvent(SDL_Event& e);
+
+		GlCamera& getCamera();
 };
 
 #endif

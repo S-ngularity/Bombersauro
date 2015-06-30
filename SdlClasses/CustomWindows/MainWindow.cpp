@@ -1,6 +1,6 @@
 #include "SdlClasses/CustomWindows/MainWindow.h"
 
-#include "Map.h"
+#include "Game.h"
 
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/EventCode.h"
@@ -11,15 +11,12 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-MainWindow::MainWindow(Map* m) : 
+MainWindow::MainWindow() : 
 	SdlWindow(	"Bombersauro", 20, 40, 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window size 
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window resolution
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE) // superclass window constructor
 {
-	worldMap = m;
-	mapObject = nullptr;
-
 	EventAggregator::Instance().getEvent<EventCode>().subscribe(
 															[&](EventCode &c){ contentsChanged(c); });
 
@@ -34,9 +31,6 @@ MainWindow::~MainWindow()
 {
 	EventAggregator::Instance().getEvent<EventCode>().unsubscribe(
 															[&](EventCode &c){ contentsChanged(c); });
-
-	if(mapObject != nullptr)
-		delete mapObject;
 }
 
 void MainWindow::contentsChanged(EventCode &c)
@@ -47,7 +41,7 @@ void MainWindow::contentsChanged(EventCode &c)
 
 bool MainWindow::handleInternalSdlEvent(SDL_Event& event)
 {
-	player->handleSdlEvent(event);
+	Game::Instance().getPlayer().handleSdlEvent(event);
 	
 	return true;
 }
@@ -59,8 +53,7 @@ void MainWindow::createGui()
 
 void MainWindow::initScene()
 {
-	camera = new GlCamera(getWindowWidth(), getWindowHeight());
-	player = new Player(worldMap, camera);
+	Game::Instance().getPlayer().getCamera().adjustProjection(getWindowWidth(), getWindowHeight());
 
 	initMapObject();
 }
@@ -69,10 +62,7 @@ void MainWindow::renderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(mapObject != nullptr)
-		mapObject->render(camera->getProj(), camera->getView());
-	
-	player->render(camera->getProj(), camera->getView());
+	Game::Instance().render();
 
 	signalRefresh();
 }
@@ -174,19 +164,22 @@ GLfloat vColor[3*nVerts] = {
 
 void MainWindow::initMapObject()
 {
-	std::vector<GLfloat> vectorPos(3 * nVerts * worldMap->getMapWidth() * worldMap->getMapHeight());
-	std::vector<GLfloat> vectorColor(3 * nVerts * worldMap->getMapWidth() * worldMap->getMapHeight());
+	const int mapW = Game::Instance().getMap().getMapWidth();
+	const int mapH = Game::Instance().getMap().getMapHeight();
+
+	std::vector<GLfloat> vectorPos(3 * nVerts * mapW * mapH);
+	std::vector<GLfloat> vectorColor(3 * nVerts * mapW * mapH);
 
 	// percorre cada posição do mapa preenchendo um único vetor de vértices 
 	// com versões (das posições) do cubo original, 
 	// transladadas pela posição do mapa e escaladas pela altura do mapa naquela posição
 	int posAtual = 0; // <- preguiça de calcular de maneira bonita a posição no vetor
-	for(int i = 0; i < worldMap->getMapWidth(); i++)
-		for(int j = 0; j < worldMap->getMapHeight(); j++)
+	for(int i = 0; i < mapW; i++)
+		for(int j = 0; j < mapH; j++)
 			for(int k = 0; k < nVerts; k++)
 			{
 				glm::vec4 v = glm::vec4(vPos[k*3], vPos[k*3+1], vPos[k*3+2], 1);
-				glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, worldMap->Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
+				glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, Game::Instance().getMap().Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
 
 				v = m * v;	
 
@@ -203,6 +196,7 @@ void MainWindow::initMapObject()
 				posAtual++;
 			}
 
-	mapObject = new GlObject(new CubeShader(), nVerts * worldMap->getMapWidth() * worldMap->getMapHeight(), &vectorPos[0], &vectorColor[0]);
+	GlObject* mapObject = new GlObject(new CubeShader(), nVerts * mapW * mapH, &vectorPos[0], &vectorColor[0]);
 	mapObject->setModelMatrix(glm::mat4(1.0f));
+	Game::Instance().addObject(mapObject);
 }

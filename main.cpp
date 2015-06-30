@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "Map.h"
+#include "Game.h"
 #include "Noises/DiamSqNoise.h"
 
 #include "SdlClasses/CustomWindows/MainWindow.h"
@@ -27,9 +27,7 @@ MainWindow *mainWindow;
 
 // precisa ser (2^n + 1) pro algorítmo de ruído: 
 // 65, 129, 257, 513, 1025... (mais de 257 começa a demorar bastante, 1025 usa 900mb de ram)
-const int mapW = 129, mapH = 129;
-Map worldMap(mapW, mapH);
-DiamSqNoise dsNoise(&worldMap);
+
 
 //funções SDL
 bool SDLStart();
@@ -42,11 +40,13 @@ int main(int argc, char* args[])
 {
 	srand(time(NULL));
 
+	DiamSqNoise dsNoise(&Game::Instance().getMap());
+	
 	while(dsNoise.getPercentComplete() < 100)
 	{
 		dsNoise.runOnce();
 	}
-	worldMap.normalize(25); // normaliza altura máxima do mapa, originalmente é 255
+	Game::Instance().getMap().normalize(25); // normaliza altura máxima do mapa, originalmente é 255
 
 	if(!SDLStart())
 	{
@@ -59,10 +59,11 @@ int main(int argc, char* args[])
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	mainWindow = new MainWindow(&worldMap);
+	mainWindow = new MainWindow();
 
 	initGlSettings();
 
+	Game::Instance().initGame();
 	mainWindow->initScene();
 	while(mainWindow->isShown())
 	{

@@ -3,9 +3,9 @@
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/WindowResized.h"
 
-GlCamera::GlCamera(int w, int h) : x(0), y(0), z(0), lookAtX(1), lookAtY(1), lookAtZ(1)
+GlCamera::GlCamera() : x(0), y(0), z(0), lookAtX(1), lookAtY(1), lookAtZ(1)
 {
-	projection = glm::perspective(glm::radians(CAMERA_FOV), w/(float)h, CAMERA_NEAR, CAMERA_FAR);
+	projection = glm::perspective(glm::radians(CAMERA_FOV), 1.f, CAMERA_NEAR, CAMERA_FAR);
 
 	EventAggregator::Instance().getEvent<WindowResized>().subscribe(
 															[&](WindowResized &e){ adjustProjection(e.w, e.h); });
