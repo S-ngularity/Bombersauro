@@ -71,7 +71,7 @@ int main(int argc, char* args[])
 			mainWindow->handleSdlEvent(event);
 		}
 
-		EventAggregator::Instance()->getEvent<Tick>().publishEvent(Tick());
+		EventAggregator::Instance().getEvent<Tick>().publishEvent(Tick());
 
 		mainWindow->renderScene();
 		mainWindow->doRefresh();

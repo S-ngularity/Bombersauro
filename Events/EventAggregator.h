@@ -8,14 +8,14 @@
 class EventAggregator
 {
 	private:
-		static EventAggregator *evtAggrInstance;
+		static EventAggregator evtAggrInstance;
 
-		EventAggregator(){evtAggrInstance = nullptr;} // private so that it can't be called
+		EventAggregator(){} // private so that it can't be called
 		EventAggregator(EventAggregator const&) = delete;
 		EventAggregator& operator=(EventAggregator const&) = delete;
 
 	public:
-		static EventAggregator* Instance() { if (evtAggrInstance == nullptr) evtAggrInstance = new EventAggregator; return evtAggrInstance;}
+		static EventAggregator& Instance() {return evtAggrInstance;}
 
 		template<typename EventType>
 		Event<EventType>& getEvent()

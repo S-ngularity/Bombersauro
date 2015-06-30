@@ -20,7 +20,7 @@ MainWindow::MainWindow(Map* m) :
 	worldMap = m;
 	mapObject = nullptr;
 
-	EventAggregator::Instance()->getEvent<EventCode>().subscribe(
+	EventAggregator::Instance().getEvent<EventCode>().subscribe(
 															[&](EventCode &c){ contentsChanged(c); });
 
 	//createGui();
@@ -32,7 +32,7 @@ MainWindow::MainWindow(Map* m) :
 
 MainWindow::~MainWindow()
 {
-	EventAggregator::Instance()->getEvent<EventCode>().unsubscribe(
+	EventAggregator::Instance().getEvent<EventCode>().unsubscribe(
 															[&](EventCode &c){ contentsChanged(c); });
 
 	if(mapObject != nullptr)

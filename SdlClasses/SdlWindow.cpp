@@ -92,7 +92,7 @@ bool SdlWindow::handleSdlEvent(SDL_Event& e)
 					glViewport(0, 0, windowWidth, windowHeight);
 
 					//gui->setWindowScale(getWindowWidthScale(), getWindowHeightScale());
-					EventAggregator::Instance()->getEvent<WindowResized>().publishEvent(WindowResized(getWindowWidth(), getWindowHeight()));
+					EventAggregator::Instance().getEvent<WindowResized>().publishEvent(WindowResized(getWindowWidth(), getWindowHeight()));
 
 					signalRefresh();
 				break;

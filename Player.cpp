@@ -132,12 +132,12 @@ Player::Player(Map *m, GlCamera *cam) : angleTempX(glm::radians(135.f)), angleTe
 	
 	updateAvatarAndCamera();
 
-	EventAggregator::Instance()->getEvent<Tick>().subscribe( [&](Tick &e){ tick(); });
+	EventAggregator::Instance().getEvent<Tick>().subscribe( [&](Tick &e){ tick(); });
 }
 
 Player::~Player()
 {
-	EventAggregator::Instance()->getEvent<Tick>().unsubscribe( [&](Tick &e){ tick(); });
+	EventAggregator::Instance().getEvent<Tick>().unsubscribe( [&](Tick &e){ tick(); });
 }
 
 void Player::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)

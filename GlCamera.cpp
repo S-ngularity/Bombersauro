@@ -7,7 +7,7 @@ GlCamera::GlCamera(int w, int h) : x(0), y(0), z(0), lookAtX(1), lookAtY(1), loo
 {
 	projection = glm::perspective(glm::radians(CAMERA_FOV), w/(float)h, CAMERA_NEAR, CAMERA_FAR);
 
-	EventAggregator::Instance()->getEvent<WindowResized>().subscribe(
+	EventAggregator::Instance().getEvent<WindowResized>().subscribe(
 															[&](WindowResized &e){ adjustProjection(e.w, e.h); });
 }
 
