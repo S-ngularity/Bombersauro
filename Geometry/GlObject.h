@@ -21,11 +21,9 @@ class GlObject
 {
 	private:
 		CubeShader *shader;
-		GlBufferObject vboPos, vboColor;
 
 		int numVerts;
-		GLfloat *vetPos;
-		GLfloat *vetColor;
+		GlBufferObject vboPos, vboColor;
 
 		glm::mat4 modelMatrix;
 

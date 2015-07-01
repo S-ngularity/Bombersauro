@@ -17,102 +17,6 @@
 #define MOVEMENT_SPEED 0.1
 #define TURN_SPEED 0.03f
 
-const int nVerts = 36;
-GLfloat vAvatarPos[3*nVerts] = {
-    // baixo
-    -0.5, -0.5, -0.5,
-    -0.5, 0.5, -0.5,
-    0.5, -0.5, -0.5,
-    0.5, -0.5, -0.5,
-    -0.5, 0.5, -0.5,
-    0.5, 0.5, -0.5,
-
-    // frente
-    -0.5, -0.5, -0.5,
-    0.5, -0.5, -0.5,
-    -0.5, -0.5, 0.5,
-    -0.5, -0.5, 0.5,
-    0.5, -0.5, -0.5,
-    0.5, -0.5, 0.5,
-
-    // lado direito
-    0.5, -0.5, -0.5,
-    0.5, 0.5, -0.5,
-    0.5, -0.5, 0.5,
-    0.5, -0.5, 0.5,
-    0.5, 0.5, -0.5,
-    0.5, 0.5, 0.5,
-
-    // cima
-    0.5, -0.5, 0.5,
-    0.5, 0.5, 0.5,
-    -0.5, -0.5, 0.5,
-    -0.5, -0.5, 0.5,
-    0.5, 0.5, 0.5,
-    -0.5, 0.5, 0.5,
-
-    // lado esquerdo
-    -0.5, -0.5, -0.5,
-    -0.5, -0.5, 0.5,
-    -0.5, 0.5, -0.5,
-    -0.5, 0.5, -0.5,
-    -0.5, -0.5, 0.5,
-    -0.5, 0.5, 0.5,
-
-    // fundo
-    -0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5,
-    -0.5, 0.5, -0.5,
-    -0.5, 0.5, -0.5,
-    0.5, 0.5, 0.5,
-    0.5, 0.5, -0.5
-};
-
-GLfloat vAvatarColor[3*nVerts] = {
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2,
-    0.2, 0.2, 0.2
-};
-
-
 Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f)), mouseXPosOriginal(0), mouseYPosOriginal(0)
 {
 	mousePressed = false;
@@ -133,13 +37,14 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	deltaAngle = 0.0;
 	deltaMove=0.0;
 
-	//playerAvatar = new GlObject(new CubeShader(), nVerts, &vAvatarPos[0], &vAvatarColor[0]);
+	perna1Ang = 45.f;
+	perna2Ang = 150.f;
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
 
-	loadOBJ("Geometry/dinosaur.obj", vertices, uvs, normals);
+	loadOBJ("Geometry/dinobody.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){
@@ -156,6 +61,32 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	}
 
 	playerAvatar = new GlObject(new CubeShader(), vertices.size(), &vPos[0], &vColor[0]);
+
+	std::vector<glm::vec3> verticesLeg;
+	std::vector<glm::vec2> uvsLeg;
+	std::vector<glm::vec3> normalsLeg; // Won't be used at the moment.
+
+	loadOBJ("Geometry/dinoleg.obj", verticesLeg, uvsLeg, normalsLeg);
+
+	std::vector<GLfloat> vColorLeg1;
+	for(int i=0; i < (int)verticesLeg.size(); i++){
+		vColorLeg1.push_back(0.1);
+		vColorLeg1.push_back(0.5);
+		vColorLeg1.push_back(0.1);
+	}
+
+	std::vector<GLfloat> vPosLeg1;
+	for(int i=0; i < (int)verticesLeg.size(); i++){
+		vPosLeg1.push_back(verticesLeg[i].x);
+		vPosLeg1.push_back(verticesLeg[i].y);
+		vPosLeg1.push_back(verticesLeg[i].z);
+	}
+
+	playerLeg1 = new GlObject(new CubeShader(), verticesLeg.size(), &vPosLeg1[0], &vColorLeg1[0]);
+
+	std::vector<GLfloat> vPosLeg2(vPosLeg1);
+	std::vector<GLfloat> vColorLeg2(vColorLeg1);
+	playerLeg2 = new GlObject(new CubeShader(), verticesLeg.size(), &vPosLeg2[0], &vColorLeg2[0]);
 	
 	updateAvatarAndCamera();
 
@@ -170,6 +101,8 @@ Player::~Player()
 void Player::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)
 {
 	playerAvatar->render(projMatrix, viewMatrix);
+	playerLeg1->render(projMatrix, viewMatrix);
+	playerLeg2->render(projMatrix, viewMatrix);
 }
 
 void Player::updateAvatarAndCamera()
@@ -189,9 +122,24 @@ void Player::updateAvatarAndCamera()
 
 	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
 									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
-									* glm::translate(glm::mat4(1.0f), glm::vec3(0.75, -0.42, 0))
-									* glm::scale(glm::mat4(1.0f), glm::vec3(0.6, 0.6, 0.6)) );
+									* glm::translate(glm::mat4(1.0f), glm::vec3(0.25, -0.6, 0))
+									* glm::scale(glm::mat4(1.0f), glm::vec3(0.05, 0.05, 0.05)) );
 									//* glm::rotate(glm::mat4(1.0f), -angY, glm::vec3(1, 0, 0)));
+
+	playerLeg1->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
+									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
+									* glm::translate(glm::mat4(1.0f), glm::vec3(-0.23, -0.12, 0))
+									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03))
+									* glm::rotate(glm::mat4(1.0f), glm::radians(perna1Ang), glm::vec3(1, 0, 0))
+								);
+
+	playerLeg2->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
+									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
+									* glm::translate(glm::mat4(1.0f), glm::vec3(0.32, -0.12, 0))
+									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03)) 
+									* glm::rotate(glm::mat4(1.0f), glm::radians(perna2Ang), glm::vec3(1, 0, 0))
+								);
+
 	playerCamera.setPos(	x - camDist * lx, 
 							y + camHeightY + camDist * (-ly), 
 							z - camDist * lz);
@@ -388,6 +336,14 @@ void Player::moveMeFlat(float i)
 	{
 		x = proxX;
 		z = proxZ;
+
+		perna1Ang += 10;
+		if(perna1Ang > 360)
+			perna1Ang -= 360;
+		
+		perna2Ang += 10;
+		if(perna2Ang > 360)
+			perna2Ang -= 360;
 	}
 }
 

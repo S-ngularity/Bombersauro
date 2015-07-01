@@ -46,7 +46,7 @@ int main(int argc, char* args[])
 	{
 		dsNoise.runOnce();
 	}
-	Game::Instance().getMap().normalize(25); // normaliza altura máxima do mapa, originalmente é 255
+	Game::Instance().getMap().normalize(15); // normaliza altura máxima do mapa, originalmente é 255
 
 	if(!SDLStart())
 	{

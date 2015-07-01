@@ -15,8 +15,6 @@
 #include "GlCamera.h"
 #include "Geometry/GlObject.h"
 
-#include "Map.h"
-
 class Player
 {
 	private:
@@ -39,7 +37,11 @@ class Player
 		bool boolOnTheGround;
 		float ySpeed;
 
+		float perna1Ang, perna2Ang;
+
 		GlObject *playerAvatar;
+		GlObject *playerLeg1;
+		GlObject *playerLeg2;
 		
 		GlCamera playerCamera;
 

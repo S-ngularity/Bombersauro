@@ -1,18 +1,16 @@
 #include "Geometry/GlObject.h"
 
-GlObject::GlObject(CubeShader *s, int nVerts, GLfloat *vPos, GLfloat *vColor)
+GlObject::GlObject(CubeShader *s, int nVerts, GLfloat *vetPos, GLfloat *vetColor)
 {
 	shader = s;
 	numVerts = nVerts;
-	vetPos = vPos;
-	vetColor = vColor;
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboPos);
-	glBufferData(GL_ARRAY_BUFFER, 3*nVerts*sizeof(GLfloat), vetPos, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3*numVerts*sizeof(GLfloat), vetPos, GL_STATIC_DRAW);
 	checkGlErrors();
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboColor);
-	glBufferData(GL_ARRAY_BUFFER, 3*nVerts*sizeof(GLfloat), vetColor, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3*numVerts*sizeof(GLfloat), vetColor, GL_STATIC_DRAW);
 	checkGlErrors();
 
 }
