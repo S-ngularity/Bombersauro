@@ -42,6 +42,24 @@ void MainWindow::contentsChanged(EventCode &c)
 bool MainWindow::handleInternalSdlEvent(SDL_Event& event)
 {
 	Game::Instance().getPlayer().handleSdlEvent(event);
+
+	switch(event.type)
+	{
+		case SDL_KEYDOWN:
+			switch(event.key.keysym.sym)
+			{
+				case SDLK_r:
+				{
+					Game::Instance().resetMap();
+					Game::Instance().removeObject(mapObject);
+					delete mapObject;
+
+					initMapObject();
+				}
+				break;
+			}
+		break;
+	}
 	
 	return true;
 }
@@ -196,7 +214,7 @@ void MainWindow::initMapObject()
 				posAtual++;
 			}
 
-	GlObject* mapObject = new GlObject(new CubeShader(), nVerts * mapW * mapH, &vectorPos[0], &vectorColor[0]);
+	mapObject = new GlObject(new CubeShader(), nVerts * mapW * mapH, &vectorPos[0], &vectorColor[0]);
 	mapObject->setModelMatrix(glm::mat4(1.0f));
 	Game::Instance().addObject(mapObject);
 }

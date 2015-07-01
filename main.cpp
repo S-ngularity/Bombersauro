@@ -7,7 +7,6 @@
 #include <time.h>
 
 #include "Game.h"
-#include "Noises/DiamSqNoise.h"
 
 #include "SdlClasses/CustomWindows/MainWindow.h"
 
@@ -39,14 +38,6 @@ void initGlSettings();
 int main(int argc, char* args[])
 {
 	srand(time(NULL));
-
-	DiamSqNoise dsNoise(&Game::Instance().getMap());
-	
-	while(dsNoise.getPercentComplete() < 100)
-	{
-		dsNoise.runOnce();
-	}
-	Game::Instance().getMap().normalize(15); // normaliza altura máxima do mapa, originalmente é 255
 
 	if(!SDLStart())
 	{

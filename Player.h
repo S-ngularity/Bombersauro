@@ -15,6 +15,8 @@
 #include "GlCamera.h"
 #include "Geometry/GlObject.h"
 
+class Bomba;
+
 class Player
 {
 	private:
@@ -37,6 +39,9 @@ class Player
 		bool boolOnTheGround;
 		float ySpeed;
 
+		float shootAng;
+		float shootForce;
+
 		float perna1Ang, perna2Ang;
 
 		GlObject *playerAvatar;
@@ -44,6 +49,8 @@ class Player
 		GlObject *playerLeg2;
 		
 		GlCamera playerCamera;
+
+		Bomba *bomb;
 
 		void updateAvatarAndCamera();
 
@@ -54,6 +61,8 @@ class Player
 		~Player();
 
 		void render(glm::mat4 projMatrix, glm::mat4 viewMatrix);
+
+		void resetPos();
 
 		bool handleSdlEvent(SDL_Event& e);
 
