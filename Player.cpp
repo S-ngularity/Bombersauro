@@ -3,6 +3,10 @@
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/Tick.h"
 
+#include "Geometry/objloader.h"
+
+#include <vector>
+
 #include "Game.h"
 
 #define MOUSE_SENSIBILITY 0.004
@@ -129,7 +133,29 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	deltaAngle = 0.0;
 	deltaMove=0.0;
 
-	playerAvatar = new GlObject(new CubeShader(), nVerts, &vAvatarPos[0], &vAvatarColor[0]);
+	//playerAvatar = new GlObject(new CubeShader(), nVerts, &vAvatarPos[0], &vAvatarColor[0]);
+
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+
+	loadOBJ("Geometry/dinosaur.obj", vertices, uvs, normals);
+
+	std::vector<GLfloat> vColor;
+	for(int i=0; i < (int)vertices.size(); i++){
+		vColor.push_back(0.1);
+		vColor.push_back(0.5);
+		vColor.push_back(0.1);
+	}
+
+	std::vector<GLfloat> vPos;
+	for(int i=0; i < (int)vertices.size(); i++){
+		vPos.push_back(vertices[i].x);
+		vPos.push_back(vertices[i].y);
+		vPos.push_back(vertices[i].z);
+	}
+
+	playerAvatar = new GlObject(new CubeShader(), vertices.size(), &vPos[0], &vColor[0]);
 	
 	updateAvatarAndCamera();
 
@@ -162,7 +188,9 @@ void Player::updateAvatarAndCamera()
 	}
 
 	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
-									* glm::rotate(glm::mat4(1.0f), -angX, glm::vec3(0, 1, 0)));
+									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
+									* glm::translate(glm::mat4(1.0f), glm::vec3(0.75, -0.42, 0))
+									* glm::scale(glm::mat4(1.0f), glm::vec3(0.6, 0.6, 0.6)) );
 									//* glm::rotate(glm::mat4(1.0f), -angY, glm::vec3(1, 0, 0)));
 	playerCamera.setPos(	x - camDist * lx, 
 							y + camHeightY + camDist * (-ly), 

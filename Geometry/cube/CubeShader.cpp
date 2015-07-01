@@ -1,4 +1,4 @@
-#include "cubeShader.h"
+#include "CubeShader.h"
 
 #include "glsupport.h"
 
