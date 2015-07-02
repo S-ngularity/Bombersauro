@@ -32,15 +32,15 @@ Bomba::Bomba(float x, float y, float z, float ang, float force, float dirx, floa
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	std::vector<glm::vec3> normals;
 
 	loadOBJ("Geometry/bomba.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){
-		vColor.push_back(0.1);
-		vColor.push_back(0.1);
-		vColor.push_back(0.1);
+		vColor.push_back(0.2);
+		vColor.push_back(0.2);
+		vColor.push_back(0.2);
 	}
 
 	std::vector<GLfloat> vPos;
@@ -50,7 +50,15 @@ Bomba::Bomba(float x, float y, float z, float ang, float force, float dirx, floa
 		vPos.push_back(vertices[i].z);
 	}
 
-	bombaObj = new GlObject(new CubeShader(), vertices.size(), &vPos[0], &vColor[0]);
+	std::vector<GLfloat> vNormals;
+	for(int i=0; i < (int)normals.size(); i++){
+		vNormals.push_back(normals[i].x);
+		vNormals.push_back(normals[i].y);
+		vNormals.push_back(normals[i].z);
+	}
+
+	bombaObj = new GlObject(new NormalShader(), vertices.size(), &vPos[0], &vColor[0], normals.size(), &vNormals[0]);
+	
 	Game::Instance().addObject(bombaObj);
 
 	EventAggregator::Instance().getEvent<Tick>().subscribe( [&](Tick &e){ tick(); });

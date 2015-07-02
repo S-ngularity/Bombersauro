@@ -19,6 +19,17 @@ void checkGlErrors() {
   }
 }
 
+void checkGlErrors(const char *s) {
+  const GLenum errCode = glGetError();
+
+  if (errCode != GL_NO_ERROR) {
+    string error("GL Error: ");
+    error += reinterpret_cast<const char*>(gluErrorString(errCode));
+    cerr << error << "    (" << s << ")" << endl;
+    throw runtime_error(error);
+  }
+}
+
 // Dump text file into a character vector, throws exception on error
 static void readTextFile(const char *fn, vector<char>& data) {
   // Sets ios::binary bit to prevent end of line translation, so that the

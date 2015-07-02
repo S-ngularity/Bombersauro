@@ -9,6 +9,7 @@
 // Check if there has been an error inside OpenGL and if yes, print the error and
 // through a runtime_error exception.
 void checkGlErrors();
+void checkGlErrors(const char *s);
 
 // Reads and compiles a pair of vertex shader and fragment shader files into a
 // GL shader program. Throws runtime_error on error

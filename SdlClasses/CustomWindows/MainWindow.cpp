@@ -5,6 +5,8 @@
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/EventCode.h"
 
+#include "Geometry/objloader.h"
+
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -79,142 +81,81 @@ void MainWindow::initScene()
 void MainWindow::renderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	Game::Instance().render();
-
+	
 	signalRefresh();
 }
 
 const int nVerts = 36;
-GLfloat vPos[3*nVerts] = {
-	// baixo
-	0, 0, 0,
-	0, 1, 0,
-	1, 0, 0,
-	1, 0, 0,
-	0, 1, 0,
-	1, 1, 0,
 
-	// frente
-	0, 0, 0,
-	1, 0, 0,
-	0, 0, 1,
-	0, 0, 1,
-	1, 0, 0,
-	1, 0, 1,
 
-	// lado direito
-	1, 0, 0,
-	1, 1, 0,
-	1, 0, 1,
-	1, 0, 1,
-	1, 1, 0,
-	1, 1, 1,
-
-	// cima
-	1, 0, 1,
-	1, 1, 1,
-	0, 0, 1,
-	0, 0, 1,
-	1, 1, 1,
-	0, 1, 1,
-
-	// lado esquerdo
-	0, 0, 0,
-	0, 0, 1,
-	0, 1, 0,
-	0, 1, 0,
-	0, 0, 1,
-	0, 1, 1,
-
-	// fundo
-	0, 1, 1,
-	1, 1, 1,
-	0, 1, 0,
-	0, 1, 0,
-	1, 1, 1,
-	1, 1, 0
-};
-
-GLfloat vColor[3*nVerts] = {
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-	0.396, 0.262, 0.129,
-
-	0.0, 0.7, 0.0,
-	0.0, 0.65, 0.0,
-	0.0, 0.6, 0.0,
-	0.0, 0.6, 0.0,
-	0.0, 0.65, 0.0,
-	0.0, 0.6, 0.0
-};
 
 void MainWindow::initMapObject()
 {
 	const int mapW = Game::Instance().getMap().getMapWidth();
 	const int mapH = Game::Instance().getMap().getMapHeight();
 
-	std::vector<GLfloat> vectorPos(3 * nVerts * mapW * mapH);
-	std::vector<GLfloat> vectorColor(3 * nVerts * mapW * mapH);
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals;
+	
+	loadOBJ("Geometry/cube.obj", vertices, uvs, normals);
+
+	std::vector<GLfloat> vectorPos(3 * vertices.size() * mapW * mapH);
+	std::vector<GLfloat> vectorColor(3 * vertices.size() * mapW * mapH);
+	std::vector<GLfloat> vectorNormals(3 * normals.size() * mapW * mapH);
 
 	// percorre cada posição do mapa preenchendo um único vetor de vértices 
 	// com versões (das posições) do cubo original, 
 	// transladadas pela posição do mapa e escaladas pela altura do mapa naquela posição
 	int posAtual = 0; // <- preguiça de calcular de maneira bonita a posição no vetor
+	int posAtualNorms = 0;
 	for(int i = 0; i < mapW; i++)
 		for(int j = 0; j < mapH; j++)
-			for(int k = 0; k < nVerts; k++)
+		{
+			glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, Game::Instance().getMap().Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
+			
+			for(int k = 0; k < (int)vertices.size(); k++)
 			{
-				glm::vec4 v = glm::vec4(vPos[k*3], vPos[k*3+1], vPos[k*3+2], 1);
-				glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, Game::Instance().getMap().Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
+				glm::vec4 v = glm::vec4(vertices[k].x, vertices[k].y, vertices[k].z, 1);
 
 				v = m * v;	
 
-				vectorPos[posAtual] = v[0];
-				vectorColor[posAtual] = vColor[k*3];
-				posAtual++;
+				vectorPos[posAtual] = v.x;
+				vectorColor[posAtual] = 0.396;
+				++posAtual;
 
-				vectorPos[posAtual] = v[1];
-				vectorColor[posAtual] = vColor[k*3 + 1];
-				posAtual++;
+				vectorPos[posAtual] = v.y;
+				vectorColor[posAtual] = 0.262;
+				++posAtual;
 
-				vectorPos[posAtual] = v[2];
-				vectorColor[posAtual] = vColor[k*3 + 2];
-				posAtual++;
+				vectorPos[posAtual] = v.z;
+				vectorColor[posAtual] = 0.129;
+				++posAtual;
 			}
 
-	mapObject = new GlObject(new CubeShader(), nVerts * mapW * mapH, &vectorPos[0], &vectorColor[0]);
+			for(int k = 0; k < (int)normals.size(); k++)
+			{
+				glm::vec4 vN = glm::vec4(normals[k].x, normals[k].y, normals[k].z, 1);
+
+				vN = m * vN;
+
+				vectorNormals[posAtualNorms] = vN.x;
+				++posAtualNorms;
+				vectorNormals[posAtualNorms] = vN.y;
+				++posAtualNorms;
+				vectorNormals[posAtualNorms] = vN.z;
+				++posAtualNorms;
+			}
+		}
+
+	mapObject = new GlObject(new NormalShader(), 
+								vertices.size()  * mapW * mapH, 
+								&vectorPos[0], 
+								&vectorColor[0], 
+								normals.size()  * mapW * mapH, &vectorNormals[0]);
 	mapObject->setModelMatrix(glm::mat4(1.0f));
+	
 	Game::Instance().addObject(mapObject);
 }

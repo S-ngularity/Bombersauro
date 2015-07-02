@@ -15,17 +15,19 @@
 
 #include "glsupport.h"
 
-#include "Geometry/cube/CubeShader.h"
+#include "Geometry/NormalShader.h"
 
 class GlObject
 {
 	private:
-		CubeShader *shader;
+		NormalShader *shader;
 
 		int numVerts;
-		GlBufferObject vboPos, vboColor;
+		int numNormals;
+		GlBufferObject vboPos, vboColor, vboNormals;
 
 		glm::mat4 modelMatrix;
+		glm::vec3 lightIntensity;
 
 		//std::function<bool(SDL_Event& e)> evtHandler;
 		//std::function<void()> preRenderProcedure;
@@ -34,7 +36,9 @@ class GlObject
 		//std::list<GlObject*> childList;
 
 	public:
-		GlObject(CubeShader *s, int nVerts, GLfloat *vPos, GLfloat *vColor);
+		static glm::vec3 lightPos;
+		
+		GlObject(NormalShader *s, int nVerts, GLfloat *vetPos, GLfloat *vetColor, int nNormals, GLfloat *vetNormals);
 		virtual ~GlObject();
 
 		void setModelMatrix(glm::mat4 m);

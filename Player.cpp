@@ -77,7 +77,14 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 		vPos.push_back(vertices[i].z);
 	}
 
-	playerAvatar = new GlObject(new CubeShader(), vertices.size(), &vPos[0], &vColor[0]);
+	std::vector<GLfloat> vNormals;
+	for(int i=0; i < (int)normals.size(); i++){
+		vNormals.push_back(normals[i].x);
+		vNormals.push_back(normals[i].y);
+		vNormals.push_back(normals[i].z);
+	}
+
+	playerAvatar = new GlObject(new NormalShader(), vertices.size(), &vPos[0], &vColor[0], normals.size(), &vNormals[0]);
 
 	std::vector<glm::vec3> verticesLeg;
 	std::vector<glm::vec2> uvsLeg;
@@ -99,11 +106,19 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 		vPosLeg1.push_back(verticesLeg[i].z);
 	}
 
-	playerLeg1 = new GlObject(new CubeShader(), verticesLeg.size(), &vPosLeg1[0], &vColorLeg1[0]);
+	std::vector<GLfloat> vNormalsLeg1;
+	for(int i=0; i < (int)normalsLeg.size(); i++){
+		vNormalsLeg1.push_back(normalsLeg[i].x);
+		vNormalsLeg1.push_back(normalsLeg[i].y);
+		vNormalsLeg1.push_back(normalsLeg[i].z);
+	}
+
+	playerLeg1 = new GlObject(new NormalShader(), verticesLeg.size(), &vPosLeg1[0], &vColorLeg1[0], normalsLeg.size(), &vNormalsLeg1[0]);
 
 	std::vector<GLfloat> vPosLeg2(vPosLeg1);
 	std::vector<GLfloat> vColorLeg2(vColorLeg1);
-	playerLeg2 = new GlObject(new CubeShader(), verticesLeg.size(), &vPosLeg2[0], &vColorLeg2[0]);
+	std::vector<GLfloat> vNormalsLeg2(vNormalsLeg1);
+	playerLeg2 = new GlObject(new NormalShader(), verticesLeg.size(), &vPosLeg2[0], &vColorLeg2[0], normalsLeg.size(), &vNormalsLeg2[0]);
 	
 	updateAvatarAndCamera();
 

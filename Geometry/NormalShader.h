@@ -1,5 +1,5 @@
-#ifndef CUBESHADER_H
-#define CUBESHADER_H
+#ifndef NORMALSHADER_H
+#define NORMALSHADER_H
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -7,7 +7,7 @@
 
 #include "glsupport.h"
 
-class CubeShader {
+class NormalShader {
 
     public:
 
@@ -16,11 +16,15 @@ class CubeShader {
     GLint h_uModelMatrix;
 	GLint h_uViewMatrix;
 	GLint h_uProjMatrix;
+	GLint h_uLightPosition;
+	GLint h_uLightIntensity;
 
     GLint h_aPosition;
     GLint h_aColor;
+	GLint h_aNormal;
 
-    CubeShader();
+
+    NormalShader();
 };
 
 #endif
