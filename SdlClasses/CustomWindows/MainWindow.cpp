@@ -150,7 +150,7 @@ void MainWindow::initMapObject()
 			}
 		}
 
-	mapObject = new GlObject(new NormalShader(), 
+	mapObject = new GlObject(Game::Instance().getNormalShader(), 
 								vertices.size()  * mapW * mapH, 
 								&vectorPos[0], 
 								&vectorColor[0], 

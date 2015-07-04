@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "Geometry/GlObject.h"
+#include "Geometry/NormalShader.h"
 
 #include <list>
 
@@ -29,6 +30,8 @@ class Game
 		
 		Player *player;
 
+		NormalShader *normalShader;
+
 		std::list<GlObject*> objectList;
 
 	public:
@@ -42,6 +45,8 @@ class Game
 
 		Map& getMap();
 		Player& getPlayer();
+
+		NormalShader* getNormalShader();
 
 		void resetMap();
 };

@@ -57,7 +57,7 @@ Bomba::Bomba(float x, float y, float z, float ang, float force, float dirx, floa
 		vNormals.push_back(normals[i].z);
 	}
 
-	bombaObj = new GlObject(new NormalShader(), vertices.size(), &vPos[0], &vColor[0], normals.size(), &vNormals[0]);
+	bombaObj = new GlObject(Game::Instance().getNormalShader(), vertices.size(), &vPos[0], &vColor[0], normals.size(), &vNormals[0]);
 	
 	Game::Instance().addObject(bombaObj);
 

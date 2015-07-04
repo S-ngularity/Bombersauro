@@ -14,6 +14,8 @@ void Game::initGame()
 	}
 	worldMap.normalize(maxMapH); // normaliza altura máxima do mapa, originalmente é 255
 	
+	normalShader = new NormalShader();
+
 	player = new Player();
 }
 
@@ -56,6 +58,11 @@ Map& Game::getMap()
 Player& Game::getPlayer()
 {
 	return *player;
+}
+
+NormalShader* Game::getNormalShader()
+{
+	return normalShader;
 }
 
 void Game::resetMap()
