@@ -30,11 +30,13 @@
 #define SHOOT_FORCE_MAX 60
 #define SHOOT_FORCE_INCREMENT 2
 
-Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f)), mouseXPosOriginal(0), mouseYPosOriginal(0)
+Player::Player()
 {
 	bomb = nullptr;
 	
-	mousePressed = false;
+	SDL_GetMouseState(&mouseLastX, &mouseLastY);
+	mouseLeftPressed = false;
+	mouseRightPressed = false;
 	boolKeyboardAngle = false;
 	boolMove = false;
 
@@ -42,9 +44,14 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	boolOnTheGround = false;
 	ySpeed = 0;
 
-	angleX = glm::radians(135.f);
-	angleY = glm::radians(25.f);
-	orientMe(angleX, angleY);
+	cameraAngleX = glm::radians(135.f);
+	cameraAngleY = glm::radians(25.f);
+	playerAngleX = cameraAngleX;
+	playerAngleY = cameraAngleY;
+	orientMe();
+	camlx = playerlx;
+	camlz = playerlz;
+	camly = playerly;
 
 	x = 0.5f;
 	y = Game::Instance().getMap().getH(0, 0);
@@ -152,28 +159,15 @@ void Player::resetPos()
 
 void Player::updateAvatarAndCamera()
 {
-	float angX, angY;
-
-	if(!mousePressed)
-	{
-		angX = angleX;
-		angY = angleY;
-	}
-	else
-	{
-		angX = angleTempX;
-		angY = angleTempY;
-	}
-
 	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) // move até posição do player
-									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
+									* glm::rotate(glm::mat4(1.0f), -playerAngleX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
 									* glm::translate(glm::mat4(1.0f), glm::vec3(0.25, -0.05, 0)) // ajusta modelo original
 									* glm::scale(glm::mat4(1.0f), glm::vec3(0.05, 0.05, 0.05))
 									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0)) // rotaciona Y pra direção da câmera
 								);
 
 	playerLeg1->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) // move até posição do player
-									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
+									* glm::rotate(glm::mat4(1.0f), -playerAngleX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
 									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0)) // rotaciona Y pra direção da câmera
 									* glm::translate(glm::mat4(1.0f), glm::vec3(-0.23, 0.38,  -0.3)) // ajusta modelo
 									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03))
@@ -181,44 +175,78 @@ void Player::updateAvatarAndCamera()
 								);
 
 	playerLeg2->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
-									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
+									* glm::rotate(glm::mat4(1.0f), -playerAngleX + glm::radians(180.f), glm::vec3(0, 1, 0))
 									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0))
 									* glm::translate(glm::mat4(1.0f), glm::vec3(0.29, 0.38, -0.3))
 									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03)) 
 									* glm::rotate(glm::mat4(1.0f), glm::radians(perna2Ang), glm::vec3(1, 0, 0))
 								);
 
-	playerCamera.setPos(	x - camDist * lx - cos(angX) * camOffset, 
-							y + camHeightY + camDist * (-ly), 
-							z - camDist * lz - sin(angX) * camOffset);
-	playerCamera.lookAtPos(x + 10000 * lx, 
-							y + 10000 * ly, 
-							z + 10000 * lz);
+	playerCamera.setPos(	x - camDist * camlx - cos(cameraAngleX) * camOffset, 
+							y + camHeightY + camDist * (-camly), 
+							z - camDist * camlz - sin(cameraAngleX) * camOffset);
+	playerCamera.lookAtPos(x + 10000 * camlx, 
+							y + 10000 * camly, 
+							z + 10000 * camlz);
 }
 
 void Player::tick()
 {
-	if (boolMove)
-		moveMeFlat(deltaMove);
-
-	if (boolKeyboardAngle)
+	// botão direito orienta player pra nova direção da camera
+	if(mouseRightPressed)
 	{
-		angleX += deltaAngle;
-		
-		if(!mousePressed)
-			orientMe(angleX, angleY);
-		else
+		playerlx = camlx;
+		playerlz = camlz;
+		playerly = camly;
+
+		playerAngleX = cameraAngleX;
+		playerAngleY = cameraAngleY;
+	}
+
+	// só orienta o player pelo teclado quando não controlando direção do player com o mouse
+	else
+	{
+		if (boolKeyboardAngle)
 		{
-			int mouseX, mouseY;
-			SDL_GetMouseState(&mouseX, &mouseY);
+			playerAngleX += deltaAngle;
+			
+			orientMe();
+			
+			// só orienta a câmera pra direção do player quando não está sendo controlada pelo mouse
+			if(!mouseLeftPressed)
+			{
+				cameraAngleX = playerAngleX;
+				cameraAngleY = playerAngleY;
 
-			// recalcula ângulo temporário do movimento do mouse com o novo angleX
-			angleTempX = angleX + (mouseX - mouseXPosOriginal) * MOUSE_SENSIBILITY;
-			orientMe(angleTempX, angleTempY);
+				camlx = playerlx;
+				camly = playerly;
+				camlz = playerlz;
 
+			}
 		}
 	}
 
+	// move player com teclas ou com os dois botões do mouse apertados
+	if (boolMove || (mouseLeftPressed && mouseRightPressed))
+	{
+		// se está movendo com botões do mouse, seta velocidade 
+		// de movimento e matém player virado pra direção da câmera
+		if(mouseLeftPressed && mouseRightPressed)
+		{
+			deltaMove = MOVEMENT_SPEED;
+
+			playerlx = camlx;
+			playerlz = camlz;
+			playerly = camly;
+
+			playerAngleX = cameraAngleX;
+			playerAngleY = cameraAngleY;
+		}
+
+		moveMeFlat(deltaMove);
+	}
+
+	// gravidade
 	y += ySpeed;
 	ySpeed -= GRAVITY;
 
@@ -238,7 +266,6 @@ void Player::tick()
 
 bool Player::handleSdlEvent(SDL_Event& event)
 {
-	int mouseX, mouseY;
 	switch(event.type)
 	{
 		case SDL_KEYDOWN:
@@ -282,7 +309,7 @@ bool Player::handleSdlEvent(SDL_Event& event)
 
 				case SDLK_e: 
 				{
-					bomb = new Bomba(x, y, z, shootAng, shootForce, lx, ly, lz);
+					bomb = new Bomba(x, y, z, shootAng, shootForce, playerlx, playerly, playerlz);
 				}		
 				break;
 
@@ -363,43 +390,51 @@ bool Player::handleSdlEvent(SDL_Event& event)
 		break;
 
 		case SDL_MOUSEBUTTONDOWN:
-			SDL_GetMouseState(&mouseX, &mouseY);
-
-			mouseXPosOriginal = mouseX;
-			mouseYPosOriginal = mouseY;
-
-			mousePressed = true;
+			SDL_GetMouseState(&mouseLastX, &mouseLastY);
+			
+			if(event.button.button == SDL_BUTTON_LEFT)
+				mouseLeftPressed = true;
+			
+			else if(event.button.button == SDL_BUTTON_RIGHT)
+				mouseRightPressed = true;
 		break;
 		
 		case SDL_MOUSEBUTTONUP:
-			angleY = angleTempY;
-			angleX = angleTempX;
-
-			mousePressed = false;
+			
+			if(event.button.button == SDL_BUTTON_LEFT)
+				mouseLeftPressed = false;
+			
+			else if(event.button.button == SDL_BUTTON_RIGHT)
+				mouseRightPressed = false;
 		break;
 
 		case SDL_MOUSEMOTION:
-			if(mousePressed)
+			if(mouseLeftPressed || mouseRightPressed)
 			{
+				int mouseX, mouseY;
 				SDL_GetMouseState(&mouseX, &mouseY);
 
 				// ângulo atual após movimento é o ângulo original + diferença 
 				// da pos original e a pos atual do mouse * sensibilidade
-				angleTempX = angleX + (mouseX - mouseXPosOriginal) * MOUSE_SENSIBILITY; 
-				angleTempY = angleY + (mouseY - mouseYPosOriginal) * MOUSE_SENSIBILITY;
+				cameraAngleX = cameraAngleX + (mouseX - mouseLastX) * MOUSE_SENSIBILITY; 
+				cameraAngleY = cameraAngleY + (mouseY - mouseLastY) * MOUSE_SENSIBILITY;
+
+				mouseLastX = mouseX;
+				mouseLastY = mouseY;
 
 				// evita que camera rode de cabeça pra baixo e flipe 
 				// (trava quando olhando completamente pra baixo e tenta ir mais)
-				if(angleTempY > 1.50)
-					angleTempY = 1.50;
+				if(cameraAngleY > 1.50)
+					cameraAngleY = 1.50;
 
-				else if(angleTempY < -1.50)
-					angleTempY = -1.50;
+				else if(cameraAngleY < -1.50)
+					cameraAngleY = -1.50;
 				
-				lx = cos(angleTempY)*sin(angleTempX);
-				lz = -cos(angleTempY)*cos(angleTempX);
-				ly = -sin(angleTempY);
+				camlx = cos(cameraAngleY)*sin(cameraAngleX);
+				camlz = -cos(cameraAngleY)*cos(cameraAngleX);
+				camly = -sin(cameraAngleY);
 			}
+			
 		break;
 	}
 
@@ -409,11 +444,11 @@ bool Player::handleSdlEvent(SDL_Event& event)
 	return true;
 }
 
-void Player::orientMe(float angX, float angY)
+void Player::orientMe()
 {
-	lx = cos(angY)*sin(angX);
-	lz = -cos(angY)*cos(angX);
-	ly = -sin(angY);
+	playerlx = cos(playerAngleY)*sin(playerAngleX);
+	playerlz = -cos(playerAngleY)*cos(playerAngleX);
+	playerly = -sin(playerAngleY);
 }
 
 void Player::moveMeFlat(float i)
@@ -422,17 +457,17 @@ void Player::moveMeFlat(float i)
 	z = z + i*lz;
 	y = y + i*ly;*/
 
-	float proxX = x + i*lx, proxZ = z + i*lz;
+	float proxX = x + i*playerlx, proxZ = z + i*playerlz;
 	
 	if(y >= Game::Instance().getMap().getH(proxX, proxZ))
 	{
-		if(proxX*lx+proxZ*lz > x*lx+z*lz)
+		if(proxX*playerlx+proxZ*playerlz > x*playerlx+z*playerlz)
 		{
 			perna1Ang += LEG_TURNING_SPEED;
 			perna2Ang += LEG_TURNING_SPEED;;
 		}
 
-		else if(proxX*lx+proxZ*lz < x*lx+z*lz)
+		else if(proxX*playerlx+proxZ*playerlz < x*playerlx+z*playerlz)
 		{
 			perna1Ang -= LEG_TURNING_SPEED;
 			perna2Ang -= LEG_TURNING_SPEED;;

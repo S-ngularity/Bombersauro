@@ -24,17 +24,19 @@ class Player
 		const float camOffset = 0.8;
 
 		float x, y, z;
-		float lx, ly, lz;
+		float playerlx, playerly, playerlz;
+		float playerAngleX, playerAngleY;
 
 		float deltaMove, deltaAngle;
-		float angleX, angleY;
-		float angleTempX,angleTempY;
-		int mouseXPosOriginal, mouseYPosOriginal;
 
-		bool boolKeyboardAngle, boolMove, boolDragged;
-		bool mousePressed;
+		float camlx, camly, camlz;
+		float cameraAngleX, cameraAngleY;
+		int mouseLastX, mouseLastY;
 
-		void orientMe(float angX, float angY);
+		bool boolKeyboardAngle, boolMove;
+		bool mouseLeftPressed, mouseRightPressed;
+
+		void orientMe();
 		void moveMeFlat(float i);
 
 		bool allowedToFly;
