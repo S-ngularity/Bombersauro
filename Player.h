@@ -10,10 +10,10 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "glsupport.h"
+#include "GlClasses/glsupport.h"
 
-#include "GlCamera.h"
-#include "Geometry/GlObject.h"
+#include "GlClasses/GlCamera.h"
+#include "GlClasses/GlObject.h"
 
 class Bomba;
 

@@ -5,7 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "glsupport.h"
+#include "GlClasses/glsupport.h"
 
 class NormalShader {
 

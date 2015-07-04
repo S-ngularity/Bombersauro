@@ -12,7 +12,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "glsupport.h"
+#include "GlClasses/glsupport.h"
 
 #define CAMERA_FOV 75.f
 #define CAMERA_NEAR 0.1f

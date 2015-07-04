@@ -47,7 +47,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	orientMe(angleX, angleY);
 
 	x = 0.5f;
-	y = Game::Instance().getMap().Tile(0, 0).getH();
+	y = Game::Instance().getMap().getH(0, 0);
 	z = 0.5f;
 
 	deltaAngle = 0.0;
@@ -63,7 +63,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	loadOBJ("Geometry/dinobody.obj", vertices, uvs, normals);
+	loadOBJ("Geometry/Objects/dinobody.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){
@@ -92,7 +92,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	std::vector<glm::vec2> uvsLeg;
 	std::vector<glm::vec3> normalsLeg;
 
-	loadOBJ("Geometry/dinoleg.obj", verticesLeg, uvsLeg, normalsLeg);
+	loadOBJ("Geometry/Objects/dinoleg.obj", verticesLeg, uvsLeg, normalsLeg);
 
 	std::vector<GLfloat> vColorLeg1;
 	for(int i=0; i < (int)verticesLeg.size(); i++){
@@ -146,7 +146,7 @@ void Player::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)
 void Player::resetPos()
 {
 	x = 0.5f;
-	y = Game::Instance().getMap().Tile(0, 0).getH();
+	y = Game::Instance().getMap().getH(0, 0);
 	z = 0.5f;
 }
 
@@ -223,9 +223,9 @@ void Player::tick()
 	ySpeed -= GRAVITY;
 
 	// checa se chegou no chão
-	if(y <= Game::Instance().getMap().Tile(x, z).getH())
+	if(y <= Game::Instance().getMap().getH(x, z))
 	{
-		y = Game::Instance().getMap().Tile(x, z).getH();
+		y = Game::Instance().getMap().getH(x, z);
 		ySpeed = 0;
 		boolOnTheGround = true;
 	}
@@ -424,7 +424,7 @@ void Player::moveMeFlat(float i)
 
 	float proxX = x + i*lx, proxZ = z + i*lz;
 	
-	if(y >= Game::Instance().getMap().Tile(proxX, proxZ).getH())
+	if(y >= Game::Instance().getMap().getH(proxX, proxZ))
 	{
 		if(proxX*lx+proxZ*lz > x*lx+z*lz)
 		{

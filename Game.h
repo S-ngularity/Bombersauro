@@ -1,9 +1,9 @@
 #ifndef GAME
 #define GAME
 
-#include "Map.h"
+#include "Map/Map.h"
 #include "Player.h"
-#include "Geometry/GlObject.h"
+#include "GlClasses/GlObject.h"
 #include "Geometry/NormalShader.h"
 
 #include <list>

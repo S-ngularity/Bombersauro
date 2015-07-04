@@ -34,7 +34,7 @@ Bomba::Bomba(float x, float y, float z, float ang, float force, float dirx, floa
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	loadOBJ("Geometry/bomba.obj", vertices, uvs, normals);
+	loadOBJ("Geometry/Objects/bomba.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){
@@ -113,7 +113,7 @@ void Bomba::moveMeFlat(float i)
 
 	/*float proxX = x + i*lx, proxZ = z + i*lz;
 	
-	if(y - 0.5f >= Game::Instance().getMap().Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
+	if(y - 0.5f >= Game::Instance().getMap().getH(proxX, proxZ)) // -0.5f pra descontar a metade inferior do cubo avatar
 	{
 		x = proxX;
 		z = proxZ;

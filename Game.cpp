@@ -1,6 +1,6 @@
 #include "Game.h"
 
-#include "Noises/DiamSqNoise.h"
+#include "Map/Noises/DiamSqNoise.h"
 
 Game Game::gameInstance;
 

@@ -100,7 +100,7 @@ void MainWindow::initMapObject()
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 	
-	loadOBJ("Geometry/cube.obj", vertices, uvs, normals);
+	loadOBJ("Geometry/Objects/cube.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vectorPos(3 * vertices.size() * mapW * mapH);
 	std::vector<GLfloat> vectorColor(3 * vertices.size() * mapW * mapH);
@@ -114,7 +114,7 @@ void MainWindow::initMapObject()
 	for(int i = 0; i < mapW; i++)
 		for(int j = 0; j < mapH; j++)
 		{
-			glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, Game::Instance().getMap().Tile(i, j).getH(), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
+			glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(1, Game::Instance().getMap().getH(i, j), 1)) * glm::translate(glm::mat4(1.0f), glm::vec3(i, 0, j));
 			
 			for(int k = 0; k < (int)vertices.size(); k++)
 			{

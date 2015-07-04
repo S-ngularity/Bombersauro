@@ -9,11 +9,12 @@ CXX = g++
 #flags Windows:
 CXXFLAGS = -lmingw32 -lSDL2main -lSDL2 -lopengl32 -lglu32 -lglew32 -Wall -std=c++11 -MMD -I .
 
-SRC =	main.cpp Pos.cpp MapTile.cpp glsupport.cpp GlCamera.cpp Map.cpp Bomba.cpp Player.cpp Game.cpp \
+SRC =	main.cpp Bomba.cpp Player.cpp Game.cpp \
+		Map/Map.cpp Map/Noises/DiamSqNoise.cpp \
 		SdlClasses/SdlWindow.cpp SdlClasses/CustomWindows/MainWindow.cpp \
-		Noises/DiamSqNoise.cpp \
-		Geometry/GlObject.cpp Geometry/NormalShader.cpp Geometry/objloader.cpp \
-		Events/EventAggregator.cpp
+		Events/EventAggregator.cpp \
+		GlClasses/GlObject.cpp GlClasses/glsupport.cpp GlClasses/GlCamera.cpp\
+		Geometry/NormalShader.cpp Geometry/objloader.cpp
 		
 OUT = Bombersauro
 

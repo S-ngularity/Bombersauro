@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "glsupport.h"
+#include "GlClasses/glsupport.h"
 
 SdlWindow::SdlWindow(char const *title, int x, int y, int w, int h, int resW, int resH, Uint32 windowFlags)
 {

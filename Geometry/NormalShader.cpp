@@ -1,10 +1,10 @@
 #include "NormalShader.h"
 
-#include "glsupport.h"
+#include "GlClasses/glsupport.h"
 
 NormalShader::NormalShader() {
 
-    static const char * const g_shaderFiles[2] = { "./Geometry/vphong.glsl", "./Geometry/fphong.glsl"};
+    static const char * const g_shaderFiles[2] = { "./Geometry/Shaders/vphong.glsl", "./Geometry/Shaders/fphong.glsl"};
 
     readAndCompileShader(program, g_shaderFiles[0], g_shaderFiles[1]);
 

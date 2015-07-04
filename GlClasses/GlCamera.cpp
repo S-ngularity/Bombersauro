@@ -1,4 +1,4 @@
-#include "GlCamera.h"
+#include "GlClasses/GlCamera.h"
 
 #include "Events/EventAggregator.h"
 #include "Events/CustomEvents/WindowResized.h"

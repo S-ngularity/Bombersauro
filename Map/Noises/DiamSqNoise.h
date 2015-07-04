@@ -1,7 +1,7 @@
 #ifndef DIAMSQNOISE
 #define DIAMSQNOISE
 
-#include "../Noises/Noise.h"
+#include "Map/Noises/Noise.h"
 
 class DiamSqNoise : public Noise
 {

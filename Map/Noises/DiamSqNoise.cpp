@@ -1,5 +1,5 @@
 #include "DiamSqNoise.h"
-#include "../Map.h"
+#include "Map/Map.h"
 
 #include <iostream>
 #include <cmath>
@@ -77,15 +77,15 @@ squares again.
 
 			map->setSeaLevel(SEA_LEVEL);
 
-			map->Tile(0, 0).setH(TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
-			map->Tile(0, map->getMapHeight() - 1).setH(TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
-			map->Tile(map->getMapWidth() - 1, 0).setH(TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
-			map->Tile(map->getMapWidth() - 1, map->getMapHeight() - 1).setH(TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
+			map->setH(0, 0, TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
+			map->setH(0, map->getMapHeight() - 1, TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
+			map->setH(map->getMapWidth() - 1, 0, TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
+			map->setH(map->getMapWidth() - 1, map->getMapHeight() - 1, TEMP_MAX_H/2);//rand() % (TEMP_MAX_H + 1));
 
 			randRange = TEMP_MAX_H / 2; // REPEATING FOR CLARITY WHILE DEBUGGING
 			sideLength = map->getMapWidth() - 1;
 
-			//cout << "--- " << map->Tile(0, 0).getH() << " " << map->Tile(0, map->getMapHeight() - 1).getH() << " " << map->Tile(map->getMapWidth() - 1, 0).getH() << " " << map->Tile(map->getMapWidth() - 1, map->getMapHeight() - 1).getH() << " ---" << endl;
+			//cout << "--- " << map->getH(0, 0) << " " << map->getH(0, map->getMapHeight() - 1) << " " << map->getH(map->getMapWidth() - 1, 0) << " " << map->getH(map->getMapWidth() - 1, map->getMapHeight() - 1) << " ---" << endl;
 		}
 
 		if(sideLength > 1)
@@ -113,16 +113,16 @@ void DiamSqNoise::squareStep()
 		for(int x = 0; x < map->getMapWidth() - 1; x += sideLength)
 		{
 			// average of corner values
-			int average = (	map->Tile(x, y).getH() +
-							map->Tile(x + sideLength, y).getH() +
-							map->Tile(x, y + sideLength).getH() +
-							map->Tile(x + sideLength, y + sideLength).getH()) / 4;
+			int average = (	map->getH(x, y) +
+							map->getH(x + sideLength, y) +
+							map->getH(x, y + sideLength) +
+							map->getH(x + sideLength, y + sideLength)) / 4;
 
 			// 2*randRange - randRange so the random factor is between -randRange e +randRange
 			average = average + ((rand() % (randRange * 2)) - randRange);
 
 			// center of the square is average + random factor
-			map->Tile(x + sideLength / 2, y + sideLength / 2).setH(average);
+			map->setH(x + sideLength / 2, y + sideLength / 2, average);
 
 			if(average > map->getHighestH())
 				map->setHighestH(average);
@@ -140,46 +140,46 @@ void DiamSqNoise::diamondStep()
 		for(int x = (y + halfLength) % sideLength; x < map->getMapWidth() - 1; x += sideLength)
 		{
 			//*
-			int A = map->Tile(((x - halfLength) + map->getMapWidth()-1) % (map->getMapWidth()-1), y).getH();// = map->Tile(x - halfLength, y).getH(); // left of center
-			int B = map->Tile((x + halfLength) % (map->getMapWidth()-1), y).getH();// = map->Tile(x + halfLength, y).getH(); // right of center
-			int C;// = map->Tile(x, y - halfLength).getH(); // above center
-			int D;// = map->Tile(x, y + halfLength).getH(); // below center
+			int A = map->getH(((x - halfLength) + map->getMapWidth()-1) % (map->getMapWidth()-1), y);// = map->getH(x - halfLength, y); // left of center
+			int B = map->getH((x + halfLength) % (map->getMapWidth()-1), y);// = map->getH(x + halfLength, y); // right of center
+			int C;// = map->getH(x, y - halfLength); // above center
+			int D;// = map->getH(x, y + halfLength); // below center
 
 			/*sum = 0, quantity = 0;
 
 			if(x - halfLength >= 0)
 			{
-				A = map->Tile(x - halfLength, y).getH(); // left of center
+				A = map->getH(x - halfLength, y); // left of center
 				sum += A;
 				quantity++;
-			}else{A = map->Tile(x + halfLength, y).getH();} // mirror, reusing the one inside
+			}else{A = map->getH(x + halfLength, y);} // mirror, reusing the one inside
 
 			if(x + halfLength < map->getMapWidth())
 			{
-				B = map->Tile(x + halfLength, y).getH(); // right of center
+				B = map->getH(x + halfLength, y); // right of center
 				sum += B;
 				quantity++;
-			}else{B = map->Tile(x - halfLength, y).getH();}
+			}else{B = map->getH(x - halfLength, y);}
 			*/
 			if(y - halfLength >= 0)
 			{
-				C = map->Tile(x, y - halfLength).getH(); // above center
+				C = map->getH(x, y - halfLength); // above center
 				//sum += C;
 				//quantity++;
 			}
 			
 			else
-				C = map->Tile(x, y + halfLength).getH();
+				C = map->getH(x, y + halfLength);
 
 			if(y + halfLength < map->getMapHeight())
 			{
-				D = map->Tile(x, y + halfLength).getH(); // below center
+				D = map->getH(x, y + halfLength); // below center
 				//sum += D;
 				//quantity++;
 			}
 
 			else
-				D = map->Tile(x, y - halfLength).getH();
+				D = map->getH(x, y - halfLength);
 
 			// average of corner values
 			int average = (A+B+C+D)/4;
@@ -188,13 +188,13 @@ void DiamSqNoise::diamondStep()
 
 			average = average + ((rand() % (randRange * 2)) - randRange);
 
-			map->Tile(x, y).setH(average);
+			map->setH(x, y, average);
 
 			if(x == 0)
-				map->Tile(map->getMapWidth() - 1, y).setH(average);
+				map->setH(map->getMapWidth() - 1, y, average);
 			
 			//if(y == 0)
-			//	map->Tile(x, map->getMapHeight() - 1).setH(average);
+			//	map->setH(x, map->getMapHeight() - 1, average);
 
 			if(average > map->getHighestH())
 				map->setHighestH(average);
@@ -218,11 +218,11 @@ void DiamSqNoise::checkIfFinished()
 			for(int y = 0; y < map->getMapHeight(); y++)
 				for(int x = 0; x < map->getMapWidth(); x++)
 				{
-					if(map->Tile(x, y).getH() <= SEA_LEVEL)
+					if(map->getH(x, y) <= SEA_LEVEL)
 						imageData[(map->getMapHeight() - 1 - y) * map->getMapWidth() + x] = 0;//(unsigned char)(((float)(SEA_LEVEL - 1) / MAX_H) * 256.0);
 
 					else
-						imageData[(map->getMapHeight() - 1 - y) * map->getMapWidth() + x] = (unsigned char)((int)((map->Tile(x, y).getH() - SEA_LEVEL) / (float)(MAX_H - SEA_LEVEL) * 255.0)); //(unsigned char)((int)(((float)map->Tile(x, y).getH() / MAX_H) * 256.0));
+						imageData[(map->getMapHeight() - 1 - y) * map->getMapWidth() + x] = (unsigned char)((int)((map->getH(x, y) - SEA_LEVEL) / (float)(MAX_H - SEA_LEVEL) * 255.0)); //(unsigned char)((int)(((float)map->getH(x, y) / MAX_H) * 256.0));
 				}
 
 			tgaSave("t.tga", map->getMapWidth(), map->getMapHeight(), 8, imageData);

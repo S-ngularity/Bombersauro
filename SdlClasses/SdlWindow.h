@@ -1,8 +1,6 @@
 #ifndef SDLWINDOW
 #define SDLWINDOW
 
-#include "Events/UiObject.h"
-
 #include <list>
 #include <functional>
 

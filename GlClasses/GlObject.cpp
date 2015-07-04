@@ -1,4 +1,4 @@
-#include "Geometry/GlObject.h"
+#include "GlClasses/GlObject.h"
 
 #include <glm/ext.hpp>
 

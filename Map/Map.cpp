@@ -1,21 +1,18 @@
-#include "Map.h"
-
-#include "Pos.h"
-#include "MapTile.h"
+#include "Map/Map.h"
 
 Map::Map(int w, int h)
 {
 	mapWidth = w;
 	mapHeight = h;
 
-	map = new MapTile*[mapWidth];
+	map = new int*[mapWidth]();
 
 	for(int i = 0; i < mapWidth; i++)
-		map[i] = new MapTile[mapHeight];
+		map[i] = new int[mapHeight]();
 
 	for(int y = 0; y < mapHeight; y++)
 		for(int x = 0; x < mapWidth; x++)
-			Tile(x, y).setH(INIT_H);
+			map[x][y] = INIT_H;
 
 	highestH = INIT_H;
 	lowestH = INIT_H;
@@ -30,12 +27,7 @@ Map::~Map()
 	delete [] map;
 }
 
-MapTile& Map::Tile(Pos p)
-{
-	return Tile(p.getX(), p.getY());
-}
-
-MapTile& Map::Tile(int x, int y)
+int Map::getH(int x, int y)
 {
 	if(isPosInsideWrap(x, y))
 	{
@@ -62,26 +54,21 @@ MapTile& Map::Tile(int x, int y)
 		return map[0][0];
 }
 
+void Map::setH(int x, int y, int newH)
+{
+	map[x][y] = newH;
+}
+
 void Map::normalize(int maxH)
 {
 	for(int y = 0; y < mapHeight; y++)
 		for(int x = 0; x < mapWidth; x++)
 		{
-			Tile(x, y).setH(
-				((Tile(x, y).getH() - lowestH) / (float)(highestH - lowestH)) * maxH);
+			map[x][y] = ((map[x][y] - lowestH) / (float)(highestH - lowestH)) * maxH;
 		}
 
 	setHighestH(maxH); // there will be always a highest point normalized from the original highest point
 	setLowestH(0);
-}
-
-bool Map::isPosInsideWrap(Pos p)
-{
-	if(p.getY() >= 0 && p.getY() < mapHeight)
-		return true;
-
-	else
-		return false;
 }
 
 bool Map::isPosInsideWrap(int x, int y)
@@ -92,15 +79,6 @@ bool Map::isPosInsideWrap(int x, int y)
 	else
 		return false;
 }
-
-bool Map::isPosInsideNoWrap(Pos p)
-{
-	if(p.getX() >= 0 && p.getY() >= 0 && p.getX() < mapWidth && p.getY() < mapHeight)
-		return true;
-
-	else
-		return false;
-}	
 
 bool Map::isPosInsideNoWrap(int x, int y)
 {

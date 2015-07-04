@@ -3,8 +3,8 @@
 
 #include "SdlClasses/SdlWindow.h"
 
-#include "GlCamera.h"
-#include "Geometry/GlObject.h"
+#include "GlClasses/GlCamera.h"
+#include "GlClasses/GlObject.h"
 
 #include "Player.h"
 

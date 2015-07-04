@@ -1,7 +1,7 @@
 #ifndef NOISE
 #define NOISE
 
-#include "Map.h"
+#include "Map/Map.h"
 
 #ifndef NOISESTATES
 #define NOISESTATES
