@@ -21,6 +21,7 @@ class Player
 {
 	private:
 		const int camDist = 4, camHeightY = 1;
+		const float camOffset = 0.8;
 
 		float x, y, z;
 		float lx, ly, lz;
@@ -36,6 +37,7 @@ class Player
 		void orientMe(float angX, float angY);
 		void moveMeFlat(float i);
 
+		bool allowedToFly;
 		bool boolOnTheGround;
 		float ySpeed;
 

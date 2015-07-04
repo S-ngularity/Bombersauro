@@ -9,6 +9,7 @@ GlObject::GlObject(NormalShader *s, int nVerts, GLfloat *vetPos, GLfloat *vetCol
 	shader = s;
 	numVerts = nVerts;
 	numNormals = nNormals;
+	modelMatrix = glm::mat4(1.f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboPos);
 	glBufferData(GL_ARRAY_BUFFER, 3*numVerts*sizeof(GLfloat), vetPos, GL_STATIC_DRAW);
@@ -39,9 +40,9 @@ void GlObject::setModelMatrix(glm::mat4 m)
 
 void GlObject::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)
 {
-	lightPos.x = 400;
-	lightPos.y = 900;
-	lightPos.z = 300;
+	lightPos.x = -10;
+	lightPos.y = 40;
+	lightPos.z = -20;
 	lightIntensity.x = 1;
 	lightIntensity.y = 1;
 	lightIntensity.z = 1;

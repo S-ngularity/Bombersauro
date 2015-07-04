@@ -65,7 +65,9 @@ int main(int argc, char* args[])
 
 		EventAggregator::Instance().getEvent<Tick>().publishEvent(Tick());
 
-		mainWindow->renderScene();
+		if(!mainWindow->isMinimized())
+			mainWindow->renderScene();
+
 		mainWindow->doRefresh();
 	}
 

@@ -16,15 +16,16 @@
 #define GRAVITY 0.004
 #define JUMP_START_SPEED 0.1
 
-#define MOVEMENT_SPEED 0.2
+#define MOVEMENT_SPEED 0.15
 #define TURN_SPEED 0.03f
+#define LEG_TURNING_SPEED (40*MOVEMENT_SPEED)
 
 #define ANG_SHOOT_START 20
 #define ANG_MIN 10
 #define ANG_MAX 75
 #define ANG_INCREMENT 5
 
-#define SHOOT_FORCE_START 20
+#define SHOOT_FORCE_START 10
 #define SHOOT_FORCE_MIN 10
 #define SHOOT_FORCE_MAX 60
 #define SHOOT_FORCE_INCREMENT 2
@@ -37,6 +38,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	boolKeyboardAngle = false;
 	boolMove = false;
 
+	allowedToFly = false;
 	boolOnTheGround = false;
 	ySpeed = 0;
 
@@ -45,7 +47,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	orientMe(angleX, angleY);
 
 	x = 0.5f;
-	y = Game::Instance().getMap().Tile(0, 0).getH() + 0.5f; // +0.5 para avatar não ficar metade dentro do chão
+	y = Game::Instance().getMap().Tile(0, 0).getH();
 	z = 0.5f;
 
 	deltaAngle = 0.0;
@@ -54,12 +56,12 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 	shootAng = ANG_SHOOT_START;
 	shootForce = SHOOT_FORCE_START;
 
-	perna1Ang = 45.f;
-	perna2Ang = 150.f;
+	perna1Ang = 245.f;
+	perna2Ang = 40.f;
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	std::vector<glm::vec3> normals;
 
 	loadOBJ("Geometry/dinobody.obj", vertices, uvs, normals);
 
@@ -88,7 +90,7 @@ Player::Player() : angleTempX(glm::radians(135.f)), angleTempY(glm::radians(25.f
 
 	std::vector<glm::vec3> verticesLeg;
 	std::vector<glm::vec2> uvsLeg;
-	std::vector<glm::vec3> normalsLeg; // Won't be used at the moment.
+	std::vector<glm::vec3> normalsLeg;
 
 	loadOBJ("Geometry/dinoleg.obj", verticesLeg, uvsLeg, normalsLeg);
 
@@ -144,7 +146,7 @@ void Player::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)
 void Player::resetPos()
 {
 	x = 0.5f;
-	y = Game::Instance().getMap().Tile(0, 0).getH() + 0.5f; // +0.5 para avatar não ficar metade dentro do chão
+	y = Game::Instance().getMap().Tile(0, 0).getH();
 	z = 0.5f;
 }
 
@@ -163,33 +165,35 @@ void Player::updateAvatarAndCamera()
 		angY = angleTempY;
 	}
 
-	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
-									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
-									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0))
-									* glm::translate(glm::mat4(1.0f), glm::vec3(0.25, -0.6, 0))
-									* glm::scale(glm::mat4(1.0f), glm::vec3(0.05, 0.05, 0.05)) );
-									//* glm::rotate(glm::mat4(1.0f), -angY, glm::vec3(1, 0, 0)));
+	playerAvatar->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) // move até posição do player
+									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
+									* glm::translate(glm::mat4(1.0f), glm::vec3(0.25, -0.05, 0)) // ajusta modelo original
+									* glm::scale(glm::mat4(1.0f), glm::vec3(0.05, 0.05, 0.05))
+									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0)) // rotaciona Y pra direção da câmera
+								);
 
-	playerLeg1->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
-									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
-									* glm::translate(glm::mat4(1.0f), glm::vec3(-0.23, -0.12, 0))
+	playerLeg1->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) // move até posição do player
+									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0)) // rotaciona pra direção do player
+									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0)) // rotaciona Y pra direção da câmera
+									* glm::translate(glm::mat4(1.0f), glm::vec3(-0.23, 0.38,  -0.3)) // ajusta modelo
 									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03))
-									* glm::rotate(glm::mat4(1.0f), glm::radians(perna1Ang), glm::vec3(1, 0, 0))
+									* glm::rotate(glm::mat4(1.0f), glm::radians(perna1Ang), glm::vec3(1, 0, 0)) // roda perna
 								);
 
 	playerLeg2->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z)) 
 									* glm::rotate(glm::mat4(1.0f), -angX + glm::radians(180.f), glm::vec3(0, 1, 0))
-									* glm::translate(glm::mat4(1.0f), glm::vec3(0.32, -0.12, 0))
+									//* glm::rotate(glm::mat4(1.0f), angY, glm::vec3(1, 0, 0))
+									* glm::translate(glm::mat4(1.0f), glm::vec3(0.29, 0.38, -0.3))
 									* glm::scale(glm::mat4(1.0f), glm::vec3(0.03, 0.03, 0.03)) 
 									* glm::rotate(glm::mat4(1.0f), glm::radians(perna2Ang), glm::vec3(1, 0, 0))
 								);
 
-	playerCamera.setPos(	x - camDist * lx, 
+	playerCamera.setPos(	x - camDist * lx - cos(angX) * camOffset, 
 							y + camHeightY + camDist * (-ly), 
-							z - camDist * lz);
-	playerCamera.lookAtPos(x + 10 * lx, 
-							y + 10 * ly, 
-							z + 10 * lz);
+							z - camDist * lz - sin(angX) * camOffset);
+	playerCamera.lookAtPos(x + 10000 * lx, 
+							y + 10000 * ly, 
+							z + 10000 * lz);
 }
 
 void Player::tick()
@@ -219,9 +223,9 @@ void Player::tick()
 	ySpeed -= GRAVITY;
 
 	// checa se chegou no chão
-	if(y - 0.5f <= Game::Instance().getMap().Tile(x, z).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
+	if(y <= Game::Instance().getMap().Tile(x, z).getH())
 	{
-		y = Game::Instance().getMap().Tile(x, z).getH() + 0.5f;
+		y = Game::Instance().getMap().Tile(x, z).getH();
 		ySpeed = 0;
 		boolOnTheGround = true;
 	}
@@ -271,7 +275,7 @@ bool Player::handleSdlEvent(SDL_Event& event)
 
 				case SDLK_SPACE: 
 				{
-					//if(boolOnTheGround)
+					if(boolOnTheGround || allowedToFly)
 						ySpeed = JUMP_START_SPEED;
 				}		
 				break;
@@ -279,6 +283,12 @@ bool Player::handleSdlEvent(SDL_Event& event)
 				case SDLK_e: 
 				{
 					bomb = new Bomba(x, y, z, shootAng, shootForce, lx, ly, lz);
+				}		
+				break;
+
+				case SDLK_f: 
+				{
+					allowedToFly = !allowedToFly;
 				}		
 				break;
 
@@ -380,11 +390,11 @@ bool Player::handleSdlEvent(SDL_Event& event)
 
 				// evita que camera rode de cabeça pra baixo e flipe 
 				// (trava quando olhando completamente pra baixo e tenta ir mais)
-				if(angleTempY > 1.57)
-					angleTempY = 1.57;
+				if(angleTempY > 1.50)
+					angleTempY = 1.50;
 
-				else if(angleTempY < -1.57)
-					angleTempY = -1.57;
+				else if(angleTempY < -1.50)
+					angleTempY = -1.50;
 				
 				lx = cos(angleTempY)*sin(angleTempX);
 				lz = -cos(angleTempY)*cos(angleTempX);
@@ -414,18 +424,18 @@ void Player::moveMeFlat(float i)
 
 	float proxX = x + i*lx, proxZ = z + i*lz;
 	
-	if(y - 0.5f >= Game::Instance().getMap().Tile(proxX, proxZ).getH()) // -0.5f pra descontar a metade inferior do cubo avatar
+	if(y >= Game::Instance().getMap().Tile(proxX, proxZ).getH())
 	{
 		if(proxX*lx+proxZ*lz > x*lx+z*lz)
 		{
-			perna1Ang += 10;
-			perna2Ang += 10;;
+			perna1Ang += LEG_TURNING_SPEED;
+			perna2Ang += LEG_TURNING_SPEED;;
 		}
 
 		else if(proxX*lx+proxZ*lz < x*lx+z*lz)
 		{
-			perna1Ang -= 10;
-			perna2Ang -= 10;;
+			perna1Ang -= LEG_TURNING_SPEED;
+			perna2Ang -= LEG_TURNING_SPEED;;
 		}
 
 		if(perna1Ang > 360)

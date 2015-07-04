@@ -8,7 +8,7 @@
 #include <list>
 
 const int mapW = 129, mapH = 129;
-const int maxMapH = 25;
+const int maxMapH = 20;
 
 class Game
 {

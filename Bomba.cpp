@@ -78,7 +78,7 @@ void Bomba::tick()
 {
 	if(tAtual < 1)
 	{
-		tAtual += 0.05;
+		tAtual += 0.025;
 		funCurvAtualiza();
 	}
 

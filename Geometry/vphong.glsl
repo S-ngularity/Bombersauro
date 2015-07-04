@@ -11,14 +11,14 @@ in vec3 aPosition;
 in vec3 aColor;
 in vec3 aNormal;
 
-out vec3 vFragVert;
-out vec3 vFragNormal;
+out vec4 vVert;
+out vec3 vNormal;
 out vec3 vColor;
 
 void main()
 {
-	vFragVert = aPosition;
-	vFragNormal = aNormal;
+	vVert = vec4(aPosition, 1.0);
+	vNormal = aNormal;
 	vColor = aColor;
 
 	gl_Position = uProjMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);

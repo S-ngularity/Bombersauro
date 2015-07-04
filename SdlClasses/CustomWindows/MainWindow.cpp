@@ -137,7 +137,7 @@ void MainWindow::initMapObject()
 
 			for(int k = 0; k < (int)normals.size(); k++)
 			{
-				glm::vec4 vN = glm::vec4(normals[k].x, normals[k].y, normals[k].z, 1);
+				glm::vec4 vN = glm::vec4(normals[k].x, normals[k].y, normals[k].z, 0);
 
 				vN = m * vN;
 
@@ -155,7 +155,6 @@ void MainWindow::initMapObject()
 								&vectorPos[0], 
 								&vectorColor[0], 
 								normals.size()  * mapW * mapH, &vectorNormals[0]);
-	mapObject->setModelMatrix(glm::mat4(1.0f));
-	
+
 	Game::Instance().addObject(mapObject);
 }
