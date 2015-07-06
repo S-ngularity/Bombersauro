@@ -17,22 +17,17 @@
 class Bomba
 {
 	private:
-		float xOrig, yOrig, zOrig;
-		float xAtual, yAtual, zAtual;
 		float anguloAltura;
 		float shootForce;
 
+		float xOrig, yOrig, zOrig;
+		float xAtual, yAtual, zAtual;
 		float lx, ly, lz;
-
 		float tAtual;
-
-		void orientMe(float angX, float angY);
-		void moveMeFlat(float i);
 
 		GlObject *bombaObj;
 
 		void tick();
-
 		void funCurvAtualiza();
 
 	public:

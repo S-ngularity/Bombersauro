@@ -36,9 +36,6 @@ class Player
 		bool boolKeyboardAngle, boolMove;
 		bool mouseLeftPressed, mouseRightPressed;
 
-		void orientMe();
-		void moveMeFlat(float i);
-
 		bool allowedToFly;
 		bool boolOnTheGround;
 		float ySpeed;
@@ -59,6 +56,9 @@ class Player
 		void updateAvatarAndCamera();
 
 		void tick();
+
+		void orientMe();
+		void moveMeFlat(float i);
 
 	public:
 		Player();

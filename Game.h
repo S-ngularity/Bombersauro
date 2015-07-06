@@ -15,24 +15,16 @@ class Game
 {
 	private:
 		static Game gameInstance;
-		Game() : worldMap(mapW, mapH) {} // private so that it can't be called
-		~Game()
-		{
-			delete player;
-			
-			for(GlObject* o : objectList)
-				delete o;
-		}
+		Game(); // private so that it can't be called
+		~Game();
 		Game(Game const&) = delete;
 		Game& operator=(Game const&) = delete;
 
-		Map worldMap;
-		
-		Player *player;
-
 		NormalShader *normalShader;
-
 		std::list<GlObject*> objectList;
+
+		Map worldMap;
+		Player *player;
 
 	public:
 		static Game& Instance() {return gameInstance;}

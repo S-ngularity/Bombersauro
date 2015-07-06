@@ -97,28 +97,6 @@ void Bomba::tick()
 		//delete this;
 	}
 }
-
-void Bomba::orientMe(float angX, float angY)
-{
-	lx = cos(angY)*sin(angX);
-	lz = -cos(angY)*cos(angX);
-	ly = -sin(angY);
-}
-
-void Bomba::moveMeFlat(float i)
-{
-	/*x = x + i*lx;
-	z = z + i*lz;
-	y = y + i*ly;*/
-
-	/*float proxX = x + i*lx, proxZ = z + i*lz;
-	
-	if(y - 0.5f >= Game::Instance().getMap().getH(proxX, proxZ)) // -0.5f pra descontar a metade inferior do cubo avatar
-	{
-		x = proxX;
-		z = proxZ;
-	}*/
-}
 		
 void Bomba::funCurvAtualiza()
 {

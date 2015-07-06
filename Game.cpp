@@ -4,6 +4,16 @@
 
 Game Game::gameInstance;
 
+Game::Game() : worldMap(mapW, mapH) {} // private so that it can't be called
+
+Game::~Game()
+{
+	delete player;
+	
+	for(GlObject* o : objectList)
+		delete o;
+}
+
 void Game::initGame()
 {
 	DiamSqNoise dsNoise(&worldMap);

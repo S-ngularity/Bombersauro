@@ -203,8 +203,7 @@ void Player::tick()
 		playerAngleY = cameraAngleY;
 	}
 
-	// só orienta o player pelo teclado quando não controlando direção do player com o mouse
-	else
+	else // só orienta o player pelo teclado quando não controlando direção do player com o mouse
 	{
 		if (boolKeyboardAngle)
 		{
@@ -378,14 +377,16 @@ bool Player::handleSdlEvent(SDL_Event& event)
 		case SDL_MOUSEWHEEL:
 			if(event.wheel.y > 0)
 			{
-				if(shootAng < ANG_MAX)
-					shootAng += ANG_INCREMENT;
+				shootAng += ANG_INCREMENT;
+				if(shootAng > ANG_MAX)
+					shootAng = ANG_MAX;
 			}
 
 			else if(event.wheel.y < 0)
 			{
-				if(shootAng > ANG_MIN)
-					shootAng -= ANG_INCREMENT;
+				shootAng -= ANG_INCREMENT;
+				if(shootAng < ANG_MIN)
+					shootAng = ANG_MIN;
 			}
 		break;
 
@@ -434,7 +435,6 @@ bool Player::handleSdlEvent(SDL_Event& event)
 				camlz = -cos(cameraAngleY)*cos(cameraAngleX);
 				camly = -sin(cameraAngleY);
 			}
-			
 		break;
 	}
 
@@ -453,11 +453,7 @@ void Player::orientMe()
 
 void Player::moveMeFlat(float i)
 {
-	/*x = x + i*lx;
-	z = z + i*lz;
-	y = y + i*ly;*/
-
-	float proxX = x + i*playerlx, proxZ = z + i*playerlz;
+	float proxX = x + i*sin(playerAngleX), proxZ = z + i*(-cos(playerAngleX));
 	
 	if(y >= Game::Instance().getMap().getH(proxX, proxZ))
 	{
