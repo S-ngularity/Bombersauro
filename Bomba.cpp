@@ -34,7 +34,7 @@ Bomba::Bomba(float x, float y, float z, float ang, float force, float dirx, floa
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	loadOBJ("Geometry/Objects/bomba.obj", vertices, uvs, normals);
+	loadOBJ("Geometry/Objects/sphere.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){

@@ -76,6 +76,38 @@ void MainWindow::initScene()
 	Game::Instance().getPlayer().getCamera().adjustProjection(getWindowWidth(), getWindowHeight());
 
 	initMapObject();
+
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals;
+
+	loadOBJ("Geometry/Objects/sphere.obj", vertices, uvs, normals);
+
+	std::vector<GLfloat> vColor;
+	for(int i=0; i < (int)vertices.size(); i++){
+		vColor.push_back(0.95f);
+		vColor.push_back(0.95f);
+		vColor.push_back(0.95f);
+	}
+
+	std::vector<GLfloat> vPos;
+	for(int i=0; i < (int)vertices.size(); i++){
+		vPos.push_back(vertices[i].x);
+		vPos.push_back(vertices[i].y);
+		vPos.push_back(vertices[i].z);
+	}
+
+	std::vector<GLfloat> vNormals;
+	for(int i=0; i < (int)normals.size(); i++){
+		vNormals.push_back(normals[i].x);
+		vNormals.push_back(normals[i].y);
+		vNormals.push_back(normals[i].z);
+	}
+
+	lua = new GlObject(Game::Instance().getNormalShader(), vertices.size(), &vPos[0], &vColor[0], normals.size(), &vNormals[0]);
+	lua->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(-100, 400, -200)));
+
+	Game::Instance().addObject(lua);
 }
 
 void MainWindow::renderScene()
@@ -123,15 +155,24 @@ void MainWindow::initMapObject()
 				v = m * v;	
 
 				vectorPos[posAtual] = v.x;
-				vectorColor[posAtual] = 0.396;
+				if(k < 24 || k > 29)
+					vectorColor[posAtual] = 140/255.f;//0.396;
+				else
+					vectorColor[posAtual] = 175/255.f;
 				++posAtual;
 
 				vectorPos[posAtual] = v.y;
-				vectorColor[posAtual] = 0.262;
+				if(k < 24 || k > 29)
+					vectorColor[posAtual] = 95/255.f;//0.262;
+				else
+					vectorColor[posAtual] = 175/255.f;
 				++posAtual;
 
 				vectorPos[posAtual] = v.z;
-				vectorColor[posAtual] = 0.129;
+				if(k < 24 || k > 29)
+					vectorColor[posAtual] = 67/255.f;//0.129;
+				else
+					vectorColor[posAtual] = 175/255.f;
 				++posAtual;
 			}
 

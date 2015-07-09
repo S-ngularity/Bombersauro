@@ -70,13 +70,15 @@ Player::Player()
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
+	float corDino[3] = {25/255.f, 80/255.f, 25/255.f};
+
 	loadOBJ("Geometry/Objects/dinobody.obj", vertices, uvs, normals);
 
 	std::vector<GLfloat> vColor;
 	for(int i=0; i < (int)vertices.size(); i++){
-		vColor.push_back(0.1);
-		vColor.push_back(0.5);
-		vColor.push_back(0.1);
+		vColor.push_back(corDino[0]);
+		vColor.push_back(corDino[1]);
+		vColor.push_back(corDino[2]);
 	}
 
 	std::vector<GLfloat> vPos;
@@ -103,9 +105,9 @@ Player::Player()
 
 	std::vector<GLfloat> vColorLeg1;
 	for(int i=0; i < (int)verticesLeg.size(); i++){
-		vColorLeg1.push_back(0.1);
-		vColorLeg1.push_back(0.5);
-		vColorLeg1.push_back(0.1);
+		vColorLeg1.push_back(corDino[0]);
+		vColorLeg1.push_back(corDino[1]);
+		vColorLeg1.push_back(corDino[2]);
 	}
 
 	std::vector<GLfloat> vPosLeg1;

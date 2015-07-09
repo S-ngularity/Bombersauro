@@ -26,13 +26,13 @@ void main()
 	vec3 viewLightPoint = vec3( uViewMatrix * vec4(uLightPosition, 1) );
 	
 	vec3 vertexToLight = viewLightPoint - viewPos; 
-	vec3 vertexToLightN = normalize(viewLightDirectional);
+	vec3 vertexToLightN = normalize(vertexToLight);
 
 	float distance = length(vertexToLight);
 	float attenuation = 1.0;// / (1 + 0.005 * distance * distance);
 
 	// Ambient color
-	float ambCoef = 0.05;
+	float ambCoef = 0.25;
 	vec3 ambient = ambCoef * uLightIntensity * vColor;
 
 	// Difuse color
@@ -44,7 +44,7 @@ void main()
 	vec3 R = normalize(-reflect(vertexToLightN, normal));
 
 	float specCoef = pow(max(dot(R,E), 0.0), 100);
-	vec3 specular = specCoef * attenuation * vColor*0.2 * uLightIntensity;
+	vec3 specular = specCoef * attenuation * vColor*0.1 * uLightIntensity;
 
 	out_Color = vec4(ambient + (1-ambCoef)*(diffuse + specular), 1.0);
 }

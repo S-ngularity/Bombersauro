@@ -110,7 +110,7 @@ void initGlSettings()
 	if(SDL_GL_SetSwapInterval(1) < 0)
 		std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
 
-	glClearColor(128.f/255, 200.f/255, 1.f, 1.f);
+	glClearColor(15.f/255, 15.f/255, 30/255.f, 1.f);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glEnable (GL_DEPTH_TEST);

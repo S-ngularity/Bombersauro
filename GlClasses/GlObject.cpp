@@ -40,9 +40,9 @@ void GlObject::setModelMatrix(glm::mat4 m)
 
 void GlObject::render(glm::mat4 projMatrix, glm::mat4 viewMatrix)
 {
-	lightPos.x = -10;
-	lightPos.y = 40;
-	lightPos.z = -20;
+	lightPos.x = -90;
+	lightPos.y = 390;
+	lightPos.z = -190;
 	lightIntensity.x = 1;
 	lightIntensity.y = 1;
 	lightIntensity.z = 1;
