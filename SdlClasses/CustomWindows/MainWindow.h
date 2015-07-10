@@ -24,7 +24,8 @@ const int SCREEN_HEIGHT = 800;
 class MainWindow : public SdlWindow
 {
 	private:
-		GlObject *mapObject, *lua;
+		GlObject *mapObject, *lua, *sol;
+		bool dia;
 
 		// UiEvent handlers
 		void contentsChanged(EventCode &c);

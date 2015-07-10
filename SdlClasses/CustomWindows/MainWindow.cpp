@@ -19,6 +19,8 @@ MainWindow::MainWindow() :
 				SCREEN_WIDTH, SCREEN_HEIGHT, // window resolution
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE) // superclass window constructor
 {
+	dia = false;
+
 	EventAggregator::Instance().getEvent<EventCode>().subscribe(
 															[&](EventCode &c){ contentsChanged(c); });
 
@@ -57,6 +59,44 @@ bool MainWindow::handleInternalSdlEvent(SDL_Event& event)
 					delete mapObject;
 
 					initMapObject();
+				}
+				break;
+
+				case SDLK_l:
+				{
+					if(!dia)
+					{
+						Game::Instance().lightPos.x = Game::Instance().getMap().getMapWidth() + 90;
+						Game::Instance().lightPos.y = 390;
+						Game::Instance().lightPos.z = Game::Instance().getMap().getMapHeight() + 190;
+						Game::Instance().lightIntensity.x = 1;
+						Game::Instance().lightIntensity.y = 1;
+						Game::Instance().lightIntensity.z = 1;
+
+						Game::Instance().removeObject(lua);
+						Game::Instance().addObject(sol);
+
+						dia = true;
+
+						glClearColor(34.f/255, 114.f/255, 171/255.f, 1.f);
+					}
+
+					else
+					{
+						Game::Instance().lightPos.x = -90;
+						Game::Instance().lightPos.y = 390;
+						Game::Instance().lightPos.z = -190;
+						Game::Instance().lightIntensity.x = 0.5;
+						Game::Instance().lightIntensity.y = 0.5;
+						Game::Instance().lightIntensity.z = 0.5;
+
+						Game::Instance().removeObject(sol);
+						Game::Instance().addObject(lua);
+
+						dia = false;
+
+						glClearColor(15.f/255, 15.f/255, 30/255.f, 1.f);
+					}
 				}
 				break;
 			}
@@ -108,6 +148,27 @@ void MainWindow::initScene()
 	lua->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(-100, 400, -200)));
 
 	Game::Instance().addObject(lua);
+
+	std::vector<GLfloat> vSolColor;
+	std::vector<GLfloat> vSolPos(vPos);
+	std::vector<GLfloat> vSolNormals(vNormals);
+	for(int i=0; i < (int)vertices.size(); i++){
+		vSolColor.push_back(1.f);
+		vSolColor.push_back(0.95f);
+		vSolColor.push_back(0.1f);
+	}
+
+	sol = new GlObject(Game::Instance().getNormalShader(), vertices.size(), &vSolPos[0], &vSolColor[0], normals.size(), &vSolNormals[0]);
+	sol->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(Game::Instance().getMap().getMapWidth() + 100, 400, Game::Instance().getMap().getMapHeight() + 200)));
+
+	//Game::Instance().addObject(sol);
+
+	Game::Instance().lightPos.x = -90;
+	Game::Instance().lightPos.y = 390;
+	Game::Instance().lightPos.z = -190;
+	Game::Instance().lightIntensity.x = 0.5;
+	Game::Instance().lightIntensity.y = 0.5;
+	Game::Instance().lightIntensity.z = 0.5;
 }
 
 void MainWindow::renderScene()

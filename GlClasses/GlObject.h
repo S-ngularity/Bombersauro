@@ -27,7 +27,6 @@ class GlObject
 		GlBufferObject vboPos, vboColor, vboNormals;
 
 		glm::mat4 modelMatrix;
-		glm::vec3 lightIntensity;
 
 		//std::function<bool(SDL_Event& e)> evtHandler;
 		//std::function<void()> preRenderProcedure;
@@ -36,8 +35,6 @@ class GlObject
 		//std::list<GlObject*> childList;
 
 	public:
-		static glm::vec3 lightPos;
-		
 		GlObject(NormalShader *s, int nVerts, GLfloat *vetPos, GLfloat *vetColor, int nNormals, GLfloat *vetNormals);
 		virtual ~GlObject();
 

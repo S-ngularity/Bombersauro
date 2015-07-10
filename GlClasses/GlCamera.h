@@ -16,7 +16,7 @@
 
 #define CAMERA_FOV 75.f
 #define CAMERA_NEAR 0.1f
-#define CAMERA_FAR 500.f
+#define CAMERA_FAR 1000.f
 
 class GlCamera
 {

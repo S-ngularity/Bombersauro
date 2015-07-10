@@ -26,7 +26,10 @@ class Game
 		Map worldMap;
 		Player *player;
 
+
 	public:
+		glm::vec3 lightPos, lightIntensity;
+		
 		static Game& Instance() {return gameInstance;}
 		void initGame();
 
